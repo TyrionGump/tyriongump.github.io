@@ -1,0 +1,57 @@
+.scroll-progress-ring {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 90;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.36s ease,
+    transform 0.36s var(--easing-movement);
+  /* Hidden means unclickable, not just invisible. */
+  pointer-events: none;
+}
+
+.scroll-progress-ring.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.scroll-progress-ring svg {
+  display: block;
+  /* Starts the arc at twelve o'clock instead of three. */
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+
+.scroll-ring-track {
+  fill: rgba(var(--palette-background-rgb), 0.55);
+  stroke: rgba(var(--palette-accent-rgb), 0.14);
+  stroke-width: 1.5;
+}
+
+.scroll-ring-arc {
+  fill: none;
+  stroke: var(--palette-accent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  /* Short and linear: it should track the scrollbar, not lag behind it. */
+  transition: stroke-dashoffset 0.12s linear;
+}
+
+.scroll-ring-dot {
+  fill: rgba(var(--palette-accent-rgb), 0.5);
+  transition: fill 0.25s ease;
+}
+
+.scroll-progress-ring:hover .scroll-ring-dot,
+.scroll-progress-ring:focus-visible .scroll-ring-dot {
+  fill: var(--palette-accent);
+}

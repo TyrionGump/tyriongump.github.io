@@ -1,0 +1,18 @@
+version: 2
+
+updates:
+  # The deploy workflow pins actions to major tags (@v4). GitHub retires old
+  # majors as their Node runtimes go end-of-life, and this workflow only runs on
+  # push to main — so without this the breakage surfaces months later, on the day
+  # a content change silently fails to publish. A monthly PR gets that news at a
+  # harmless moment instead.
+  #
+  # npm is deliberately not watched: everything in package.json is a
+  # devDependency, nothing reaches visitors, and Vite/TypeScript/Vitest release
+  # often enough that the noise would train you to ignore this bot entirely.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: ci

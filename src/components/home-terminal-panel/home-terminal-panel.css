@@ -1,0 +1,236 @@
+/**
+ * Home: a centred hero, not a column. It uses the wide nav frame rather than the
+ * 900px interior frame because it has no footer hairline to align to.
+ */
+
+.home-page-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+}
+
+/* ---- The panel ------------------------------------------------------- */
+
+.home-terminal-panel {
+  width: 100%;
+  max-width: 600px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(var(--palette-accent-rgb), 0.2);
+  background: var(--palette-panel);
+  box-shadow: var(--shadow-panel);
+  animation: rise-in 0.9s var(--easing-movement) 0.1s both;
+  transition:
+    border-color 0.5s ease,
+    box-shadow 0.5s ease;
+}
+
+.home-terminal-panel.is-window-unfocused {
+  border-color: rgba(var(--palette-accent-rgb), 0.08);
+  box-shadow: var(--shadow-panel-unfocused);
+}
+
+.home-terminal-title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 32px;
+  padding-inline: 15px;
+  background: #0f1312;
+  border-bottom: 1px solid var(--rule-hairline);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-chrome);
+}
+
+.home-terminal-title-separator {
+  color: var(--text-faintest);
+  padding-inline: 8px;
+}
+
+.home-terminal-clock {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- The session ------------------------------------------------------ */
+
+/**
+ * A grid with a single cell. The baked transcript and the animated copy both sit
+ * in it, stacked — which is how the hidden copy goes on sizing the panel while
+ * the visible one is still filling up.
+ */
+.home-terminal-body {
+  display: grid;
+  padding: 26px 26px 30px;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.62;
+}
+
+.home-terminal-transcript {
+  grid-area: 1 / 1;
+}
+
+.home-terminal-transcript.is-sizing-replica {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.home-terminal-transcript-stage {
+  align-self: start;
+}
+
+.home-terminal-command-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5ch;
+}
+
+.home-terminal-command-line-follow-up {
+  padding-top: 22px;
+}
+
+.home-terminal-command {
+  color: var(--text-display);
+}
+
+.home-terminal-blank-line {
+  height: 22px;
+}
+
+/* An h1 — see render-home-terminal-panel.ts. Sized as a terminal line, not as a
+   heading, so the markup carries the meaning and the design stays intact. */
+.home-terminal-line-greeting {
+  margin: 0;
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: inherit;
+  color: var(--text-display);
+}
+
+.home-terminal-line-body {
+  color: var(--text-terminal-dim);
+}
+
+.home-terminal-line-status {
+  font-size: 12px;
+  color: var(--palette-status);
+}
+
+/**
+ * Entrances apply only inside the animated copy. The baked replica is hidden and
+ * must not animate — it is furniture, not choreography.
+ */
+.home-terminal-transcript-stage .home-terminal-output {
+  animation: fade-in 0.16s ease both;
+}
+
+.home-terminal-transcript-stage .home-terminal-command-line-follow-up {
+  animation: fade-in 0.18s ease both;
+}
+
+.home-terminal-transcript-stage .home-terminal-menu {
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+
+.home-terminal-transcript-stage .home-terminal-menu.is-revealed {
+  opacity: 1;
+}
+
+/* ---- The menu --------------------------------------------------------- */
+
+.home-terminal-menu-question {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 7px;
+}
+
+/* Hangs the question off the command above it, the way a tree-drawing CLI does. */
+.home-terminal-menu-connector {
+  color: #5a625c;
+  padding-right: 9px;
+}
+
+.home-terminal-menu-question-text {
+  color: #c4cbc5;
+}
+
+.home-terminal-menu-hint {
+  color: #6b756f;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.home-terminal-menu-options {
+  list-style: none;
+  margin: 0;
+  /* The choices indent under the question that asked them. */
+  padding: 0 0 0 16px;
+}
+
+.home-terminal-menu-option {
+  display: flex;
+  align-items: baseline;
+  gap: 11px;
+  cursor: pointer;
+  padding: 6px 11px 6px 5px;
+  margin-left: -5px;
+  transition: background 0.16s ease;
+}
+
+.home-terminal-menu-option.is-selected {
+  background: rgba(var(--palette-accent-rgb), 0.1);
+}
+
+.home-terminal-menu-marker {
+  display: inline-block;
+  width: 11px;
+  font-size: 11px;
+  color: #68716a;
+  transition: color 0.25s ease;
+}
+
+.home-terminal-menu-marker::before {
+  content: "○";
+}
+
+.home-terminal-menu-option.is-selected .home-terminal-menu-marker {
+  color: var(--palette-status);
+}
+
+.home-terminal-menu-option.is-selected .home-terminal-menu-marker::before {
+  content: "◉";
+}
+
+.home-terminal-menu-label {
+  min-width: 92px;
+  color: #c4cbc5;
+  transition: color 0.25s ease;
+}
+
+.home-terminal-menu-option.is-selected .home-terminal-menu-label {
+  color: var(--text-display);
+  font-weight: 500;
+}
+
+.home-terminal-menu-description {
+  font-size: 12.5px;
+  color: #79817b;
+  transition: color 0.25s ease;
+}
+
+.home-terminal-menu-option.is-selected .home-terminal-menu-description {
+  color: #a7afa8;
+}
+
+/* Anchors inherit the global white hover; inside the menu the selection is the
+   hover affordance, so the colour swap would fight it. */
+.home-terminal-menu-option:hover {
+  color: inherit;
+}

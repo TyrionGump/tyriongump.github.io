@@ -1,0 +1,655 @@
+/**
+ * Work — the project list as repository history.
+ *
+ * Two things to know before editing:
+ *
+ *  1. The rail geometry (74/12/44/38/…) is generated from `graph-geometry.ts`
+ *     into inline styles. Do not add competing positions here.
+ *  2. Rules under `.js-enabled` set the *pre-animation* state. Without
+ *     JavaScript none of them apply, so the graph ships drawn and every commit
+ *     ships open and readable. Script collapses them on mount.
+ */
+
+.work-page-frame {
+  display: flex;
+  flex-direction: column;
+  padding-top: 64px;
+  font-family: var(--font-mono);
+}
+
+/* ---- The command line -------------------------------------------------- */
+
+.work-command {
+  padding-bottom: 36px;
+  animation: rise-in 0.7s var(--easing-movement) both;
+}
+
+.work-command,
+.work-command-line {
+  font-size: 13.5px;
+  line-height: 1.8;
+  color: var(--text-terminal-output);
+}
+
+.work-command-text {
+  color: var(--text-primary-soft);
+}
+
+.work-footer {
+  /* Pushes the footer to the bottom on a short viewport, and keeps a full
+     screen of air below the root commit on a tall one. */
+  margin-top: auto;
+  padding-top: 104px;
+  flex: none;
+}
+
+/* ---- Graph structure --------------------------------------------------- */
+
+.graph-row {
+  display: grid;
+  grid-template-columns: var(--terminal-prompt-gutter) 1fr;
+  transition: opacity 0.4s ease;
+}
+
+.graph-rail-column {
+  position: relative;
+}
+
+.graph-trunk {
+  position: absolute;
+  background: var(--graph-rail);
+  transform-origin: top center;
+}
+
+.graph-branch {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* One group at one opacity: where the branch meets the trunk, two strokes
+   overlap, and separate opacities would make the join glow. */
+.graph-branch-strokes {
+  stroke: #e6ebe7;
+  opacity: 0.24;
+}
+
+.graph-node {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--palette-background);
+  border: 2px solid #78827b;
+  transition:
+    opacity 0.34s ease,
+    border-color 0.35s ease,
+    background 0.35s ease,
+    transform 0.45s var(--easing-movement);
+}
+
+.graph-node-head {
+  border-color: var(--palette-accent);
+  background: var(--palette-accent);
+}
+
+.graph-row-root .graph-node {
+  border-color: #5a625c;
+}
+
+/* ---- Pre-animation state (script only) --------------------------------- */
+
+.js-enabled .graph-trunk {
+  transform: scaleY(0);
+  transition: transform 0.62s linear;
+}
+
+.js-enabled .graph-branch-trunk,
+.js-enabled .graph-branch-curve {
+  /* The dash offsets start fully retracted. Without script they stay at 0,
+     which draws the whole path — clipped by the SVG to the row's height, so it
+     looks identical to a finished stroke. */
+  transition: stroke-dashoffset 0.6s linear;
+}
+
+.js-enabled .graph-branch-trunk {
+  stroke-dashoffset: 4000;
+}
+
+.js-enabled .graph-branch-curve {
+  stroke-dashoffset: 45;
+}
+
+.js-enabled .graph-node,
+.js-enabled [data-graph-text] {
+  opacity: 0;
+}
+
+[data-graph-text] {
+  transition: opacity 0.34s ease;
+}
+
+/* ---- HEAD row ---------------------------------------------------------- */
+
+.graph-head-content {
+  padding-right: 8px;
+}
+
+.graph-head-ref {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--palette-accent);
+  padding-bottom: 18px;
+}
+
+.graph-head-headline {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 38px;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  color: var(--text-display);
+}
+
+.graph-head-intro {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 16.5px;
+  line-height: 1.7;
+  color: var(--text-body);
+  padding-top: 18px;
+  padding-bottom: 44px;
+  max-width: 62ch;
+  text-wrap: pretty;
+}
+
+/* ---- Root row ---------------------------------------------------------- */
+
+.graph-root-content {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--text-chrome);
+  padding-bottom: 20px;
+}
+
+.graph-root-separator {
+  color: #4e5651;
+}
+
+.graph-root-subject {
+  color: #98a19b;
+}
+
+/* ---- Commit head ------------------------------------------------------- */
+
+.commit-row.is-dimmed {
+  /* Everything that is not the open commit steps back rather than competing. */
+  opacity: 0.32;
+}
+
+.commit-head {
+  cursor: pointer;
+}
+
+.commit-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--text-chrome);
+  padding-bottom: 16px;
+}
+
+.commit-hash {
+  transition: color 0.3s ease;
+}
+
+.commit-meta-separator {
+  color: #3a403c;
+}
+
+.commit-ref {
+  color: var(--text-label);
+  border: 1px solid rgba(230, 235, 231, 0.13);
+  border-radius: 3px;
+  padding: 1px 7px;
+}
+
+.commit-year {
+  margin-left: auto;
+  padding-left: 16px;
+}
+
+.commit-category {
+  margin: 0;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--palette-accent);
+  padding-bottom: 12px;
+}
+
+.commit-subject {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 30px;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  color: var(--text-display);
+}
+
+.commit-one-liner {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 16.5px;
+  line-height: 1.65;
+  color: var(--text-body-strong);
+  padding-top: 10px;
+  max-width: 58ch;
+  text-wrap: pretty;
+}
+
+.commit-role,
+.commit-stack {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.commit-role {
+  color: var(--text-label);
+  padding-top: 18px;
+}
+
+.commit-stack {
+  color: var(--text-chrome);
+  padding-top: 2px;
+}
+
+.commit-cue-row {
+  margin: 0;
+  padding-top: 24px;
+}
+
+.commit-cue {
+  display: inline-block;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-terminal-output);
+  background: transparent;
+  border: 1px solid var(--rule-hairline-strong);
+  border-radius: 4px;
+  padding: 8px 15px;
+  cursor: pointer;
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease,
+    background 0.3s ease;
+}
+
+/* Hovering the head brightens the whole control, not just the button under the
+   cursor — the entire head is the target. */
+.commit-row:not(.is-open) .commit-head:hover .commit-cue {
+  color: var(--palette-accent);
+  border-color: rgba(var(--palette-accent-rgb), 0.35);
+}
+
+.commit-row:not(.is-open) .commit-head:hover .graph-node {
+  border-color: var(--palette-accent);
+}
+
+.commit-row.is-open .graph-node {
+  border-color: var(--palette-accent);
+  background: var(--palette-accent);
+  transform: scale(1.35);
+}
+
+.commit-row.is-open .commit-hash {
+  color: var(--palette-accent);
+}
+
+.commit-row.is-open .commit-cue {
+  color: var(--palette-accent);
+  border-color: rgba(var(--palette-accent-rgb), 0.4);
+  background: rgba(var(--palette-accent-rgb), 0.06);
+}
+
+/* ---- Commit body ------------------------------------------------------- */
+
+.commit-body {
+  overflow: hidden;
+  transition: opacity 0.45s ease;
+}
+
+.js-enabled .commit-body {
+  max-height: 0;
+  opacity: 0;
+}
+
+.commit-row.is-open .commit-body {
+  opacity: 1;
+}
+
+/* Only used while folding a commit fully closed — see commit-row-expansion.ts
+   for why a switch collapses instantly and a close does not. */
+.commit-body.is-collapsing {
+  transition:
+    opacity 0.45s ease,
+    max-height 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.commit-body-inner {
+  padding: 30px 8px 8px 0;
+  transition:
+    opacity 0.5s ease,
+    transform 0.55s var(--easing-movement);
+}
+
+.commit-body-inner.is-entering {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: none;
+}
+
+/* ---- Story ------------------------------------------------------------- */
+
+.commit-story {
+  font-family: var(--font-sans);
+  padding-bottom: 34px;
+}
+
+.commit-story-section {
+  padding-bottom: 22px;
+}
+
+.commit-story-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-label);
+  padding-bottom: 9px;
+}
+
+.commit-story-body {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--text-body);
+  max-width: 65ch;
+  text-wrap: pretty;
+}
+
+/* ---- Metrics ----------------------------------------------------------- */
+
+.commit-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid rgba(230, 235, 231, 0.1);
+  border-bottom: 1px solid rgba(230, 235, 231, 0.1);
+  margin-bottom: 34px;
+}
+
+.commit-metric {
+  padding: 16px 0 16px 24px;
+  border-left: 1px solid rgba(230, 235, 231, 0.1);
+}
+
+.commit-metric:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.commit-metric-value {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 25px;
+  letter-spacing: -0.035em;
+  color: var(--text-display);
+  /* Without this the digits change width as they count and the value flickers. */
+  font-variant-numeric: tabular-nums;
+}
+
+.commit-metric-label {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  color: #7f8983;
+  margin-top: 4px;
+}
+
+/* ---- Source viewer ----------------------------------------------------- */
+
+.commit-source-command {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.commit-source-command-text {
+  font-size: 11.5px;
+  color: var(--text-label);
+}
+
+.commit-source-rule {
+  flex: 1;
+  min-width: 40px;
+  height: 1px;
+  background: rgba(230, 235, 231, 0.09);
+}
+
+.commit-source-stat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 10.5px;
+  color: var(--text-chrome);
+}
+
+.commit-source-bars {
+  letter-spacing: 1px;
+}
+
+.commit-source-bars-added,
+.commit-source-added {
+  color: var(--palette-status);
+}
+
+.commit-source-bars-removed,
+.commit-source-removed {
+  color: #8a5b52;
+}
+
+.source-viewer {
+  border: 1px solid rgba(230, 235, 231, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+  background: #0c0e0d;
+}
+
+.source-viewer-title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 32px;
+  padding-inline: 14px;
+  background: var(--palette-background);
+  border-bottom: 1px solid rgba(230, 235, 231, 0.09);
+  font-size: 10.5px;
+  color: #8a8f8a;
+}
+
+.source-viewer-filename {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.source-viewer-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--palette-accent);
+}
+
+.source-viewer-language {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #5c615d;
+}
+
+.source-viewer-body {
+  display: flex;
+  position: relative;
+}
+
+.source-viewer-line-numbers {
+  width: 44px;
+  flex: none;
+  padding: 12px 10px 12px 0;
+  text-align: right;
+  font-size: 12px;
+  line-height: 21px;
+  color: #454a47;
+  user-select: none;
+}
+
+.source-viewer-code-column {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  padding: 12px 14px 12px 0;
+  overflow: hidden;
+}
+
+/* Rides down the file as each line lands, the way a cursor would. Extends left
+   under the line numbers so it reads as a full-width row. */
+.source-viewer-line-highlight {
+  position: absolute;
+  left: -44px;
+  right: 0;
+  top: 12px;
+  height: 21px;
+  background: transparent;
+  pointer-events: none;
+  transition:
+    transform 0.18s ease,
+    background 0.3s ease;
+}
+
+.source-viewer-line-highlight.is-active {
+  background: rgba(var(--palette-accent-rgb), 0.06);
+}
+
+.source-viewer-code {
+  position: relative;
+  font-size: 12px;
+  line-height: 21px;
+}
+
+.source-viewer-line {
+  min-height: 21px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.js-enabled .source-viewer-line,
+.js-enabled .commit-console-line {
+  opacity: 0;
+}
+
+.js-enabled .source-viewer-line {
+  transition: opacity 0.22s ease;
+}
+
+.js-enabled .commit-console-line {
+  transition: opacity 0.3s ease;
+}
+
+.js-enabled .source-viewer-line.is-revealed,
+.js-enabled .commit-console-line.is-revealed {
+  opacity: 1;
+}
+
+.source-viewer-output {
+  border-top: 1px solid rgba(230, 235, 231, 0.09);
+  background: var(--palette-background);
+  padding: 9px 14px 11px;
+}
+
+.source-viewer-output-label {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #5c615d;
+  padding-bottom: 5px;
+}
+
+.commit-console {
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.commit-console-line-command {
+  color: #7e837e;
+}
+
+.commit-console-line-success {
+  color: var(--palette-status);
+}
+
+.commit-console-line-body {
+  color: #b7bdb6;
+}
+
+/* ---- Syntax tokens ----------------------------------------------------- */
+
+.code-token-comment {
+  color: #5b605c;
+}
+.code-token-string {
+  color: #9fb08a;
+}
+.code-token-keyword {
+  color: #a08cb8;
+}
+.code-token-literal {
+  color: #c0a183;
+}
+.code-token-type {
+  color: #86a3b8;
+}
+.code-token-function {
+  color: #7fa8b8;
+}
+.code-token-property {
+  color: #d2d5d0;
+}
+.code-token-punctuation {
+  color: #697070;
+}
+.code-token-text {
+  color: #c9ccc7;
+}
+
+/* ---- Responsive -------------------------------------------------------- */
+
+@media (max-width: 860px) {
+  .commit-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .commit-metric {
+    padding-left: 0;
+    border-left: 0;
+  }
+}

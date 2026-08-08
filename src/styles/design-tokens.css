@@ -1,0 +1,94 @@
+/**
+ * Design tokens. The values are exact — take them from the design rather than
+ * eyeballing a near-enough one.
+ *
+ * The palette below is the "Bone" theme, which is the default and the one the
+ * design was tuned on. Alternate themes override a handful of these in
+ * `themes.css`; everything else is theme-independent.
+ */
+
+:root {
+  /* ---- Palette: themed ------------------------------------------------ */
+  /* Accent. Carets, links, arrows, ref labels, active states. */
+  --palette-accent: #d8d4cc;
+  --palette-accent-rgb: 216, 212, 204;
+
+  /* Status green. Prompt glyph, "open to work", the live dot. Bone pins this
+     to green; other themes let it follow the accent. */
+  --palette-status: #7fbf95;
+  --palette-status-rgb: 127, 191, 149;
+
+  /* Ink: text colour on accent-filled chips. */
+  --palette-ink: #131211;
+
+  --palette-background: #0b0b0a;
+  --palette-background-rgb: 11, 11, 10;
+  --palette-band: #080807;
+  --palette-panel: #0f0f0e;
+
+  /* ---- Palette: fixed greys ------------------------------------------- */
+  /* Named for the role each plays. These do not change between themes — a theme
+     moves the accent, not the neutrals. */
+  --text-display: #f2f6f3; /* display headlines */
+  --text-primary: #edf1ec; /* primary text, project names */
+  --text-primary-soft: #e6ebe7; /* wordmark, active nav */
+  --text-primary-typed: #e4e8e3; /* typed terminal input */
+  --text-lead: #c9d0cb; /* lead paragraphs */
+  --text-config-value: #c8ccc6; /* config values */
+  --text-body: #9aa39d; /* body prose */
+  --text-body-strong: #a0a9a3; /* project one-liners */
+  --text-navigation: #939c96; /* nav links at rest */
+  --text-terminal-output: #8f9892;
+  --text-terminal-dim: #7f8983; /* dim lines inside a terminal panel */
+  --text-meta-secondary: #8b948d;
+  --text-eyebrow: #79827b; /* uppercase section eyebrows */
+  --text-console-glyph: #7c857e; /* console button, dim keys */
+  --text-label: #6e776f; /* labels, years, dim meta */
+  --text-chrome: #5f6a63; /* panel chrome, hashes, tertiary meta */
+  --text-faint: #4a504a; /* separator dots, tail log */
+  --text-faintest: #3e453f;
+  --text-hint-amber: #b79a6a; /* "tip", console warnings */
+
+  /* ---- Rules and edges ------------------------------------------------- */
+  --rule-hairline: rgba(230, 235, 231, 0.08);
+  --rule-hairline-strong: rgba(230, 235, 231, 0.16);
+  --graph-rail: rgba(230, 235, 231, 0.24);
+
+  /* ---- Layout ---------------------------------------------------------- */
+  /* One frame for every interior page: the column the footer hairline
+     measures. Reading measures are capped separately in `ch`, so widening this
+     adds margin rather than characters. */
+  --site-column-width: 900px;
+  --site-navigation-frame-width: 1160px;
+  --site-navigation-height: 72px;
+  --site-gutter-inline: 40px;
+  /* The prompt gutter. Every terminal line on Work and Personal hangs off it,
+     and the git graph draws its rails inside it. Changing it changes both. */
+  --terminal-prompt-gutter: 74px;
+
+  /* ---- Typefaces ------------------------------------------------------- */
+  /* The pairing is load-bearing: mono means "machine", sans means "human".
+     Never mix them within one line. */
+  --font-sans: "Manrope", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", "Menlo", monospace;
+
+  /* ---- Motion ---------------------------------------------------------- */
+  /* Movement eases; opacity does not. The git graph uses `linear` — a pen
+     travels at one pace, and easing makes strokes read as segments springing
+     into place rather than as drawing. */
+  --easing-movement: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-overlay: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* ---- Elevation ------------------------------------------------------- */
+  --shadow-panel: inset 0 1px 0 rgba(230, 235, 231, 0.07), 0 30px 80px -40px rgba(0, 0, 0, 0.95);
+  --shadow-panel-unfocused:
+    inset 0 1px 0 rgba(230, 235, 231, 0.02), 0 30px 80px -40px rgba(0, 0, 0, 0.95);
+  --shadow-navigation: inset 0 -1px 0 rgba(230, 235, 231, 0.08);
+  --shadow-console-overlay: 0 26px 70px rgba(0, 0, 0, 0.55);
+}
+
+@media (max-width: 720px) {
+  :root {
+    --site-gutter-inline: 24px;
+  }
+}

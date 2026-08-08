@@ -1,0 +1,224 @@
+/**
+ * Personal — prose mode.
+ *
+ * Reading measures are capped in `ch`, never px, so widening the site frame adds
+ * margin rather than characters: 58ch for the bio, 52ch for the closing
+ * statement, 14ch on the hero so it breaks into three deliberate lines.
+ */
+
+.personal-page-frame {
+  display: flex;
+  flex-direction: column;
+  padding-top: 104px;
+  animation: fade-in 0.8s ease both;
+}
+
+.personal-hero {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 46px;
+  line-height: 1.07;
+  letter-spacing: -0.045em;
+  color: var(--text-display);
+  max-width: 14ch;
+  text-wrap: pretty;
+}
+
+.personal-byline {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: var(--palette-accent);
+  padding-top: 28px;
+}
+
+/* ---- Bio --------------------------------------------------------------- */
+
+.personal-bio {
+  padding-top: 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  max-width: 58ch;
+  font-family: var(--font-sans);
+  text-wrap: pretty;
+}
+
+.personal-bio-lead {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--text-lead);
+}
+
+.personal-bio-paragraph {
+  margin: 0;
+  font-size: 16.5px;
+  line-height: 1.78;
+  color: var(--text-body);
+}
+
+/**
+ * The one word in the prose that is also a control. It is a real button so it
+ * is reachable by keyboard, but styled as part of the sentence — a dotted
+ * underline is the most a word can announce itself without breaking the line
+ * it sits in.
+ */
+.personal-console-trigger {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--text-lead);
+  border-bottom: 1px dotted rgba(230, 235, 231, 0.3);
+  cursor: pointer;
+  transition:
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.personal-console-trigger:hover {
+  color: var(--palette-accent);
+  border-bottom-color: var(--palette-accent);
+}
+
+/* ---- Now / Projects band ----------------------------------------------- */
+
+.personal-band {
+  margin-top: 88px;
+  padding-top: 38px;
+  border-top: 1px solid var(--rule-hairline);
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 24px 60px;
+  font-family: var(--font-mono);
+}
+
+.personal-band-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.personal-eyebrow {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-eyebrow);
+}
+
+.personal-now {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  gap: 9px 0;
+  font-size: 12px;
+}
+
+.personal-now-label {
+  color: var(--text-label);
+}
+
+.personal-now-value {
+  margin: 0;
+  color: var(--text-config-value);
+}
+
+.personal-now-value.is-status {
+  color: var(--palette-status);
+}
+
+.personal-projects {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  font-size: 12px;
+}
+
+.personal-project {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.personal-project-name {
+  color: var(--text-primary);
+  width: 62px;
+  flex: none;
+}
+
+.personal-project-description {
+  color: var(--text-meta-secondary);
+  flex: 1;
+}
+
+.personal-project-year {
+  color: var(--text-label);
+}
+
+.personal-projects-note {
+  margin: 0;
+  font-size: 11px;
+  color: var(--text-chrome);
+}
+
+.personal-inline-link {
+  color: var(--palette-accent);
+}
+
+/* ---- Contact ----------------------------------------------------------- */
+
+.personal-contact {
+  margin-top: 88px;
+  padding-top: 38px;
+  padding-bottom: 96px;
+  border-top: 1px solid var(--rule-hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.personal-contact-statement {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--text-lead);
+  max-width: 52ch;
+  text-wrap: pretty;
+}
+
+.personal-contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 30px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+.personal-contact-link {
+  color: var(--palette-accent);
+}
+
+.personal-footer {
+  margin-top: auto;
+}
+
+/* ---- Responsive -------------------------------------------------------- */
+
+@media (max-width: 720px) {
+  /* The two-column band is the one place this page cannot simply narrow: at
+     phone width the 1fr/1.4fr split leaves both columns too tight to read. */
+  .personal-band {
+    grid-template-columns: 1fr;
+    gap: 38px;
+  }
+}

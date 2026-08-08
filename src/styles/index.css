@@ -1,0 +1,33 @@
+/**
+ * The cascade, in order.
+ *
+ * Every stylesheet that ships is listed here, and the order they appear in is
+ * the order they cascade. Nothing else imports CSS, so "what wins?" is answered
+ * by reading down this list. Component stylesheets live beside their component;
+ * `prerendered-output.test.ts` checks that this list and those files agree.
+ */
+
+/* Foundations — fonts first so the faces are declared before anything asks for
+   them, then tokens, since everything below reads from those. */
+@import "./fonts.css";
+@import "./design-tokens.css";
+@import "./themes.css";
+@import "./reset.css";
+@import "./scrollbars.css";
+@import "./keyframes.css";
+
+/* Shared structure. */
+@import "./site-layout.css";
+@import "./terminal-primitives.css";
+
+/* Components. */
+@import "../components/site-navigation/site-navigation.css";
+@import "../components/site-footer/site-footer.css";
+@import "../components/home-terminal-panel/home-terminal-panel.css";
+@import "../components/work-git-graph/work-git-graph.css";
+@import "../components/personal-page/personal-page.css";
+
+/* Global chrome, last: the console's trigger styles override the nav's and the
+   Personal page's rest states. */
+@import "../components/scroll-progress-ring/scroll-progress-ring.css";
+@import "../components/console-overlay/console-overlay.css";

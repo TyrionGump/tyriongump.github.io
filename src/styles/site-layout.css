@@ -1,0 +1,119 @@
+/** The shell every page sits inside, and how routes are shown and hidden. */
+
+.site-shell {
+  min-height: 100vh;
+  background: var(--palette-background);
+  color: var(--text-primary-soft);
+  font-family: var(--font-sans);
+  position: relative;
+  overflow-x: clip;
+}
+
+/**
+ * Routes are toggled, not unmounted. The site is three static pages with a
+ * combined weight of a few kilobytes, so keeping them all in the document costs
+ * nothing and means a route change is one class flip with no re-render.
+ *
+ * Two mechanisms show a page, and they cannot contradict each other because both
+ * read the same hash:
+ *
+ *   `:target`     — the browser's own. Covers the window before the bundle has
+ *                   parsed, and covers visitors with JavaScript off entirely.
+ *   `.is-active`  — the router's, once it is running. Adds the entrance.
+ */
+.site-page {
+  display: none;
+  /* The id that makes `:target` work also makes the browser scroll to it. Keep
+     that landing spot clear of the sticky nav. */
+  scroll-margin-top: var(--site-navigation-height);
+}
+
+.site-page:target {
+  display: block;
+}
+
+/* Home is the fallback for a missing or unrecognised hash — matching what
+   `readRouteNameFromHash` does on the script side. */
+html:not(:has(.site-page:target)) .site-page[data-page="home"] {
+  display: block;
+}
+
+.site-page.is-active {
+  display: block;
+  animation: rise-in 0.6s var(--easing-movement) both;
+}
+
+/**
+ * The interior column: the frame every page and every footer hairline measures.
+ * Home opts out via `.site-column-wide` because it is a centred hero rather than
+ * a column, so it has no hairline to align to.
+ */
+.site-column {
+  max-width: var(--site-column-width);
+  margin: 0 auto;
+  padding-inline: var(--site-gutter-inline);
+}
+
+.site-column-wide {
+  max-width: var(--site-navigation-frame-width);
+  margin: 0 auto;
+  padding-inline: var(--site-gutter-inline);
+}
+
+/** A full page height, less the sticky nav. */
+.site-viewport-fill {
+  min-height: calc(100vh - var(--site-navigation-height));
+}
+
+/**
+ * Off-screen until focused, then it lands in the top-left corner. Every route
+ * starts with the same nav, so a keyboard visitor would otherwise tab through it
+ * again on every page.
+ */
+/* Its handler lives in main.ts, so without script it would be a control that
+   does nothing — worse than not offering one. */
+.skip-link {
+  display: none;
+}
+
+.js-enabled .skip-link {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  transform: translateY(-120%);
+  padding: 10px 18px;
+  border: 0;
+  border-bottom-right-radius: 4px;
+  background: var(--palette-accent);
+  color: var(--palette-ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  cursor: pointer;
+  transition: transform 0.2s var(--easing-movement);
+}
+
+.js-enabled .skip-link:focus-visible {
+  transform: translateY(0);
+  outline-offset: -3px;
+}
+
+/* The skip target. It needs `tabindex="-1"` to accept focus, which would
+   otherwise draw a ring around the entire page. */
+main:focus {
+  outline: none;
+}
+
+/** Visually hidden but available to screen readers and to in-page search. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

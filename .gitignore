@@ -1,0 +1,59 @@
+# ── Dependencies ──────────────────────────────────────────────────────────────
+node_modules/
+
+# pnpm keeps its content-addressable store outside the project by default, but
+# honours a local one if `store-dir` is ever pointed here.
+.pnpm-store/
+
+# ── Build output ──────────────────────────────────────────────────────────────
+# CI builds this and uploads it straight to Pages as an artifact, so it never
+# needs committing. (It would, if Pages were ever switched to "deploy from a
+# branch" instead of GitHub Actions — see README → Deploying.)
+dist/
+
+# Vite writes a transient copy of vite.config.ts next to it while bundling the
+# config. Recent versions put it under node_modules/.vite-temp/, older ones here.
+vite.config.ts.timestamp-*
+vitest.config.ts.timestamp-*
+
+# ── Tooling artefacts ─────────────────────────────────────────────────────────
+coverage/
+*.tsbuildinfo
+
+# ── Secrets ───────────────────────────────────────────────────────────────────
+# Nothing here needs an env file today — the site is static and has no runtime
+# config. Listed so that stops being true safely rather than accidentally.
+.env
+.env.*
+!.env.example
+*.local
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+pnpm-debug.log*
+npm-debug.log*
+yarn-error.log*
+
+# ── Editors and OS ────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+# VS Code: keep the shared, checked-in bits (extension recommendations, tasks)
+# and ignore the per-machine rest.
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# ── Local agent tooling ───────────────────────────────────────────────────────
+# launch.json pins an absolute node path because nvm's lazy shim is broken in
+# that shell, so it is machine-specific. Worktrees are checkouts, not source.
+.claude/worktrees/
+.claude/launch.json
+
+# ── Deliberately NOT ignored ──────────────────────────────────────────────────
+# Two things people habitually add here that this repo needs committed:
+#
+#   pnpm-lock.yaml   CI runs `pnpm install --frozen-lockfile`; without the
+#                    lockfile the build cannot resolve and fails.
+#   public/fonts/    The self-hosted woff2 files are the site's typography, not
+#                    a build artefact. Nothing regenerates them.

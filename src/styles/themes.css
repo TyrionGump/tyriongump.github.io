@@ -1,0 +1,59 @@
+/**
+ * Alternate themes, selected with `data-theme` on the root element.
+ *
+ * Bone ships as the default and lives in `design-tokens.css`; these are the
+ * four alternates. A theme moves the accent and the near-black surfaces only —
+ * the neutral greys are shared, which is what keeps the five looking like one
+ * design rather than five.
+ *
+ * Bone pins its status colour to green. The others let the status colour follow
+ * the accent, so the prompt glyph belongs to the palette it sits in.
+ */
+
+[data-theme="sage"] {
+  --palette-accent: #8fcfae;
+  --palette-accent-rgb: 143, 207, 174;
+  --palette-status: var(--palette-accent);
+  --palette-status-rgb: var(--palette-accent-rgb);
+  --palette-ink: #0a150f;
+  --palette-background: #0a0c0b;
+  --palette-background-rgb: 10, 12, 11;
+  --palette-band: #07080a;
+  --palette-panel: #0d100f;
+}
+
+[data-theme="slate"] {
+  --palette-accent: #9bb4d9;
+  --palette-accent-rgb: 155, 180, 217;
+  --palette-status: var(--palette-accent);
+  --palette-status-rgb: var(--palette-accent-rgb);
+  --palette-ink: #0a1018;
+  --palette-background: #0a0b0d;
+  --palette-background-rgb: 10, 11, 13;
+  --palette-band: #07080a;
+  --palette-panel: #0d0f12;
+}
+
+[data-theme="amber"] {
+  --palette-accent: #d9a96a;
+  --palette-accent-rgb: 217, 169, 106;
+  --palette-status: var(--palette-accent);
+  --palette-status-rgb: var(--palette-accent-rgb);
+  --palette-ink: #17100a;
+  --palette-background: #0c0b09;
+  --palette-background-rgb: 12, 11, 9;
+  --palette-band: #080706;
+  --palette-panel: #100e0b;
+}
+
+[data-theme="lilac"] {
+  --palette-accent: #b3a2d6;
+  --palette-accent-rgb: 179, 162, 214;
+  --palette-status: var(--palette-accent);
+  --palette-status-rgb: var(--palette-accent-rgb);
+  --palette-ink: #120e1a;
+  --palette-background: #0b0a0d;
+  --palette-background-rgb: 11, 10, 13;
+  --palette-band: #080709;
+  --palette-panel: #0f0d12;
+}

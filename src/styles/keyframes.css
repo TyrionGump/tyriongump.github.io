@@ -1,0 +1,73 @@
+/**
+ * Shared keyframes. Only the ones actually in use are defined here.
+ */
+
+/* Every caret on the site. `steps(1)` gives a hard on/off, not a pulse. */
+@keyframes caret-blink {
+  0%,
+  48% {
+    opacity: 1;
+  }
+  52%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Terminal output blocks. Text in a terminal renders; it does not travel. */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Page and panel entrances. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* The nav's live dot. */
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/**
+ * Reduced motion.
+ *
+ * Deliberately targeted rather than a blanket `animation: none`. Scripted
+ * sequences chain on real `transitionend` events, and globally disabling
+ * transitions would stop those events firing and stall the chain mid-way. JS
+ * skips its own choreography via `prefersReducedMotion()`; CSS only needs to
+ * settle the decorative loops and land entrances instantly.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .caret {
+    animation: none;
+    opacity: 1;
+  }
+
+  .site-navigation-status-dot {
+    animation: none;
+    opacity: 1;
+  }
+
+  .home-terminal-panel {
+    animation: none;
+  }
+}

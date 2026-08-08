@@ -1,0 +1,99 @@
+.site-navigation {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(var(--palette-background-rgb), 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-navigation);
+}
+
+.site-navigation-frame {
+  max-width: var(--site-navigation-frame-width);
+  margin: 0 auto;
+  padding-inline: var(--site-gutter-inline);
+  height: var(--site-navigation-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* `space-between` alone lets the wordmark and the first link touch once the
+     viewport is narrow enough that the free space runs out. */
+  gap: 16px;
+}
+
+.site-navigation-wordmark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text-primary-soft);
+}
+
+/* Not decoration: the dot is the same green as the prompt glyph and the
+   "open to work" line, so the site reads as one live session. */
+.site-navigation-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--palette-status);
+  animation: pulse-glow 2.8s ease-in-out infinite;
+}
+
+.site-navigation-links {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  font-size: 14.5px;
+}
+
+.site-navigation-link {
+  color: var(--text-navigation);
+  transition: color 0.3s ease;
+}
+
+.site-navigation-link.is-active {
+  color: var(--text-primary-soft);
+}
+
+.site-navigation-link-mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.site-navigation-console-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 23px;
+  height: 21px;
+  padding: 0;
+  margin-left: 4px;
+  background: transparent;
+  border: 1px solid var(--rule-hairline-strong);
+  border-radius: 4px;
+  color: var(--text-console-glyph);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.site-navigation-console-button:hover {
+  color: var(--palette-accent);
+  border-color: var(--palette-accent);
+}
+
+/**
+ * The design is desktop-first and degrades by narrowing rather than reflowing,
+ * so the nav keeps its single row on a phone. The 26px rest gap does not fit at
+ * that width, so it tightens — nothing moves, it just closes up.
+ */
+@media (max-width: 720px) {
+  .site-navigation-links {
+    gap: 15px;
+  }
+}

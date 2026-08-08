@@ -1,0 +1,39 @@
+/**
+ * Site-wide scrollbar styling.
+ *
+ * The thumb is drawn with a transparent border and `background-clip: padding-box`
+ * so it reads as a thin bar inside a wider hit area — easier to grab than an
+ * 11px-wide target while still looking like a hairline.
+ */
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--palette-accent-rgb), 0.17) var(--palette-background);
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--palette-accent-rgb), 0.15);
+  border: 3.5px solid transparent;
+  background-clip: padding-box;
+  border-radius: 11px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--palette-accent-rgb), 0.34);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}

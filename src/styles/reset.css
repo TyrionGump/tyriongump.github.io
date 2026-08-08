@@ -1,0 +1,58 @@
+/** Minimal reset. Only what the design actually depends on. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+  /* Anchors are the routing mechanism here; smooth scrolling on top of that
+     fights the scripted scroll anchoring on the Work page. */
+  scroll-behavior: auto;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--palette-background);
+}
+
+body {
+  color: var(--text-primary-soft);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #ffffff;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: rgba(var(--palette-accent-rgb), 0.28);
+}
+
+/* Terminals get the green selection instead — inside a shell, the accent reads
+   as chrome and the status colour reads as the shell itself. */
+.terminal-selection ::selection,
+.terminal-selection::selection {
+  background: rgba(var(--palette-status-rgb), 0.26);
+}
+
+:focus-visible {
+  outline: 1px solid var(--palette-accent);
+  outline-offset: 3px;
+}

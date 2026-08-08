@@ -4,18 +4,93 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>TyrionGump</title>
+    <title>Andrew — Software Engineer</title>
+    <meta
+      name="description"
+      content="Andrew builds software end to end — the database underneath, the API in the middle, and the screen you actually use. Melbourne, AU."
+    />
+
+    <!--
+      Marks the document as scripted before anything paints. Stylesheets use
+      `.js-enabled` to set pre-animation states — the git graph undrawn, commit
+      bodies collapsed. Without it those rules never apply, so the page ships
+      fully drawn and fully readable to anyone without JavaScript, and there is
+      no frame where content appears and then hides itself again.
+    -->
+    <script>
+      document.documentElement.classList.add("js-enabled");
+    </script>
+
+    <!--
+      Fonts are self-hosted (see src/styles/fonts.css). Preloading them skips the
+      CSS-then-font waterfall: without this the browser cannot know it needs a
+      font until it has parsed the stylesheet that mentions it.
+
+      `crossorigin` is required even though these are same-origin — fonts are
+      always fetched in anonymous CORS mode, and a preload whose mode does not
+      match the real request is discarded and fetched twice.
+    -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/manrope-variable-latin.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/jetbrains-mono-variable-latin.woff2"
+      crossorigin
+    />
   </head>
 
   <body>
-    <h1>Hello, I'm Andrew</h1>
+    <!--
+      Page content is baked in from src/content and src/components — at build
+      time, and on every dev-server request, since the plugin sets no `apply`
+      (see build/prerender-content-plugin.ts). Script attaches behaviour to this
+      markup; it never renders it.
 
-    <p>Software Engineer</p>
+      Each page carries both an `id` and a `data-page`. The id makes `:target`
+      work, which is what shows the right page before the bundle has loaded and
+      for anyone browsing without JavaScript. The router's `.is-active` class can
+      never disagree with it, because both are driven by the same hash.
+    -->
+    <!--
+      A button rather than the usual `<a href="#main">`: the hash is the router,
+      so pointing a link at anything that is not a route would navigate the
+      visitor to Home. main.ts moves focus directly instead.
+    -->
+    <button class="skip-link" type="button" data-skip-to-content>Skip to content</button>
 
-    <p>
-      <a href="https://github.com/TyrionGump">
-        GitHub
-      </a>
-    </p>
+    <div class="site-shell">
+      <!--prerender:site-navigation-->
+
+      <main id="main-content" tabindex="-1">
+        <section class="site-page" id="home" data-page="home">
+          <!--prerender:home-page-->
+        </section>
+
+        <section class="site-page" id="work" data-page="work">
+          <!--prerender:work-page-->
+        </section>
+
+        <section class="site-page" id="personal" data-page="personal">
+          <!--prerender:personal-page-->
+        </section>
+      </main>
+    </div>
+
+    <!--
+      Global chrome, deliberately outside `.site-shell`: both are `position:
+      fixed`, and the shell sets `overflow-x: clip`, which some engines apply to
+      fixed descendants. Keeping them out of it sidesteps that entirely.
+    -->
+    <!--prerender:console-overlay-->
+    <!--prerender:scroll-progress-ring-->
+
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

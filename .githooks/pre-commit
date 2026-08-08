@@ -1,0 +1,80 @@
+#!/bin/sh
+#
+# Format and lint check before every commit. Skip with `git commit --no-verify`.
+#
+# This resolves Node itself rather than trusting PATH. A hook runs in a
+# non-interactive shell where nvm's lazy shim never loads, so `node` here is
+# whatever happens to sit first on PATH — often an old version. oxfmt and oxlint
+# both exit 1 with an internal stack trace on anything below Node 20, which would
+# block every commit for a reason the message never names.
+#
+# Neither check writes to your files: a failure tells you what to run.
+
+repo=$(git rev-parse --show-toplevel) || exit 1
+cd "$repo" || exit 1
+
+nvm_dir=${NVM_DIR:-$HOME/.nvm}
+
+major() {
+  v=$("$1" --version 2>/dev/null) || return 1
+  echo "${v#v}" | cut -d. -f1
+}
+
+usable() {
+  [ -x "$1" ] || return 1
+  m=$(major "$1") || return 1
+  [ -n "$m" ] || return 1
+  [ "$m" -ge 20 ] 2>/dev/null
+}
+
+find_node() {
+  # 1. The version .nvmrc pins, which is also what CI reads.
+  if [ -f .nvmrc ]; then
+    want=$(tr -d ' \t\r\n' < .nvmrc)
+    for c in "$nvm_dir/versions/node/v$want/bin/node" "$nvm_dir/versions/node/v$want".*/bin/node; do
+      usable "$c" && { echo "$c"; return 0; }
+    done
+  fi
+
+  # 2. Whatever is already on PATH, if it is new enough.
+  p=$(command -v node 2>/dev/null)
+  [ -n "$p" ] && usable "$p" && { echo "$p"; return 0; }
+
+  # 3. Any other installed version that is new enough. Highest major wins.
+  best=""
+  best_major=0
+  for c in "$nvm_dir"/versions/node/*/bin/node; do
+    usable "$c" || continue
+    m=$(major "$c")
+    [ "$m" -gt "$best_major" ] && { best=$c; best_major=$m; }
+  done
+  [ -n "$best" ] && { echo "$best"; return 0; }
+
+  return 1
+}
+
+node_bin=$(find_node) || {
+  echo "pre-commit: no Node 20 or newer found." >&2
+  echo "  This project needs the version in .nvmrc (currently $(cat .nvmrc 2>/dev/null))." >&2
+  exit 1
+}
+
+PATH="$(dirname "$node_bin"):$repo/node_modules/.bin:$PATH"
+export PATH
+
+if [ ! -x "$repo/node_modules/.bin/oxfmt" ]; then
+  echo "pre-commit: dependencies are missing — run 'pnpm install'." >&2
+  exit 1
+fi
+
+if ! oxfmt --check .; then
+  echo >&2
+  echo "pre-commit: formatting. Run 'pnpm format', then stage the result." >&2
+  exit 1
+fi
+
+if ! oxlint; then
+  echo >&2
+  echo "pre-commit: lint. Fix the findings above; 'pnpm lint:fix' handles the mechanical ones." >&2
+  exit 1
+fi
