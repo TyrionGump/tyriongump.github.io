@@ -41,7 +41,7 @@ export interface CommitExpansionController {
   /**
    * Re-measures the open commit. Needed on resize, and on returning to the page:
    * a hidden element reports a height of zero, so the fit made while the page
-   * was displaced would have clipped the body away.
+   * was off-screen would have clipped the body away.
    */
   refitOpenCommit(): void;
 }
@@ -119,9 +119,9 @@ export function mountCommitExpansion(
       scope.onDispose(() => detailScope?.dispose());
 
       // Claim the full height in ONE frame: the document's height changes once,
-      // in the same frame the anchor starts, so the scrollbar thumb moves
-      // monotonically instead of stuttering. The reveal is carried by the inner
-      // content rising, not by the height growing.
+      // in the same frame the anchor starts, so the scrollbar thumb travels
+      // steadily in one direction instead of stuttering. The reveal is carried
+      // by the inner content rising, not by the height growing.
       fitBody(body);
 
       const inner = findElement(body, "[data-commit-body-inner]");

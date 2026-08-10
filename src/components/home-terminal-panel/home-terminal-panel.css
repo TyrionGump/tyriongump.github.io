@@ -42,7 +42,7 @@
   border-bottom: 1px solid var(--rule-hairline);
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--text-chrome);
+  color: var(--text-detail);
 }
 
 .home-terminal-title-separator {
@@ -229,8 +229,8 @@
   color: #a7afa8;
 }
 
-/* Anchors inherit the global white hover; inside the menu the selection is the
-   hover affordance, so the colour swap would fight it. */
+/* Anchors inherit the global white hover; inside the menu the highlight is
+   already what shows you where you are, so the colour swap would fight it. */
 .home-terminal-menu-option:hover {
   color: inherit;
 }

@@ -12,7 +12,7 @@
  *     hard-coded panel height to go stale at odd widths, and nothing shifts as
  *     content types in.
  *
- * The intro sequence reuses the same granular renderers below to build its
+ * The intro sequence reuses the same small renderers below to build its
  * animated copy, so the two can never disagree about what the session says.
  *
  * Runs in Node at build time, so nothing here — or anything it imports — may touch the DOM.
@@ -61,8 +61,9 @@ export function renderHomeIntroOutput(): HtmlFragment {
 }
 
 /**
- * The two-door menu. A menu waits for you in a way ghost text never does, and
- * `open` with no argument is a real shell pattern rather than an invented one.
+ * The two-door menu. A menu waits for you in a way a greyed-out hint never
+ * does, and `open` with no argument is a real shell pattern rather than an
+ * invented one.
  */
 export function renderHomeNavigationMenu(): HtmlFragment {
   return html`

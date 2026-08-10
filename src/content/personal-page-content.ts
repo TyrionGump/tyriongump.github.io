@@ -1,15 +1,15 @@
 /**
  * The Personal page's copy — the human half of the site.
  *
- * The bio is modelled as runs of text rather than one string because one word
- * in it ("terminal") is a control that opens the console. Keeping that as
+ * The bio is split into segments rather than kept as one string because one
+ * word in it ("terminal") is a control that opens the console. Keeping that as
  * structure means the content file never has to contain markup, and the
  * renderer never has to search prose for a magic word.
  */
 
 import { siteIdentity } from "./site-identity";
 
-export interface ProseRun {
+export interface ProseSegment {
   readonly text: string;
   /** Renders as the dotted-underline trigger that summons the console. */
   readonly opensConsole?: true;
@@ -22,7 +22,7 @@ export const personalByline = `${siteIdentity.handle} · ${siteIdentity.role} ·
 export const personalBioLead =
   "I started on backends and kept following problems until I’d touched every layer.";
 
-export const personalBioParagraphs: readonly (readonly ProseRun[])[] = [
+export const personalBioParagraphs: readonly (readonly ProseSegment[])[] = [
   [
     {
       text: "Now I take a feature from database schema to the pixel someone clicks. I’m most useful early, when nobody is sure how the thing should work yet — the part where you throw away three designs before the fourth one is obvious.",

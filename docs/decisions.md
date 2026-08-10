@@ -58,7 +58,7 @@ shell transcript. It is not built, and should not be.
 
 Home, Work and the console are all the machine talking. Personal is the one place
 a person speaks directly. Replaying it as another shell session would flatten
-exactly the moment that earns the rest of the conceit — and two complete designs
+exactly the moment that earns the rest of the idea — and two complete designs
 for one page is maintenance nobody ever sees the benefit of.
 
 ---
@@ -66,13 +66,14 @@ for one page is maintenance nobody ever sees the benefit of.
 ## Only the hairline footer is built
 
 The design offers four footer styles. The other three are alternates it already
-chose between, so carrying them would be dead code behind a prop nothing sets.
+chose between, so carrying them would be dead code behind an option nothing sets.
 
 ---
 
-## The scrollbar's alpha fade is not ported
+## The scrollbar's transparency fade is not ported
 
-The design tweens `scrollbar-color` per frame on scroll. It is undocumented, and
+The design animates `scrollbar-color` every frame while scrolling. It is
+undocumented, and
 it largely duplicates what macOS overlay scrollbars already do on their own.
 
 ---

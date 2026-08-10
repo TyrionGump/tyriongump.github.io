@@ -1,5 +1,5 @@
 /**
- * Composition root.
+ * Where the whole site is wired together.
  *
  * Everything the site does is wired here and nowhere else: which stylesheet
  * ships, which components mount, and what happens on a route change. Components
@@ -62,8 +62,8 @@ function startSite(): void {
   wireSkipLink();
   const navigation = mountSiteNavigation(requireElement(document, ".site-navigation"));
 
-  // Global chrome: mounted once, alive on every route. The console must come
-  // after the nav so its trigger there already exists to be bound.
+  // The two site-wide overlays: mounted once, alive on every route. The console
+  // must come after the nav so its trigger there already exists to be bound.
   mountConsoleOverlay(requireElement(document, "[data-console-overlay]"));
   mountScrollProgressRing(requireElement(document, "[data-scroll-ring]"));
 

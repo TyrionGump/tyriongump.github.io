@@ -10,12 +10,12 @@
  */
 
 export const siteIdentity = {
-  /** Lowercase, as it appears in the nav wordmark and terminal prompts. */
+  /** Lowercase, as it appears in the nav logo and terminal prompts. */
   handle: "andrew",
   displayName: "Andrew",
   role: "software engineer",
   location: "Melbourne, AU",
-  /** IANA zone for the terminal panel clock. */
+  /** Time zone name for the terminal panel clock, as `Region/City`. */
   timeZone: "Australia/Melbourne",
   availability: "open to work",
   githubUrl: "https://github.com/TyrionGump",

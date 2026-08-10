@@ -2,7 +2,7 @@
  * The Home page's shell session, as data.
  *
  * A line declares only what it *is* (`greeting`, `body`, `status`); the
- * stylesheet decides how that looks. A type-scale change is one CSS edit rather
+ * stylesheet decides how that looks. Resizing the text is one CSS edit rather
  * than a hunt through content.
  */
 
@@ -40,7 +40,8 @@ export const homeIntroOutput: readonly TerminalOutputLine[] = [
 
 /**
  * The second command. `open` with no argument, so the shell has to ask which —
- * a real shell pattern, and a menu waits for you in a way ghost text never does.
+ * a real shell pattern, and a menu waits for you in a way a greyed-out hint
+ * never does.
  */
 export const homeMenuCommand = "open";
 

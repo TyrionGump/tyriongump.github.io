@@ -1,6 +1,6 @@
 # tyriongump.github.io
 
-A personal site built around one conceit: the whole thing behaves like a terminal
+A personal site built around one idea: the whole thing behaves like a terminal
 session. Home is a shell window that types `whoami` and answers itself, Work is a
 `git log --graph` whose commits are the projects, and a console overlay takes
 real commands from anywhere.

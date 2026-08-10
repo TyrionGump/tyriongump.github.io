@@ -46,7 +46,8 @@ button {
 }
 
 /* Terminals get the green selection instead — inside a shell, the accent reads
-   as chrome and the status colour reads as the shell itself. */
+   as the window around the session and the status colour reads as the shell
+   itself. */
 .terminal-selection ::selection,
 .terminal-selection::selection {
   background: rgba(var(--palette-status-rgb), 0.26);

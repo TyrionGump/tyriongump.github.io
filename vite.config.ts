@@ -20,10 +20,11 @@ export default defineConfig({
      * hole.
      *
      * Two naming systems meet at these keys. The three **route** slots are
-     * `<route>-page`, where `<route>` is a `RouteName`; the three **chrome**
-     * slots are named for their component and take no suffix. So a key is not
-     * simply the module name: the design conceit owns directory and file names
-     * (`home-terminal-panel`), while the route owns the slot key (`home-page`),
+     * `<route>-page`, where `<route>` is a `RouteName`; the three slots for the
+     * nav and the two overlays are named for their component and take no
+     * suffix. So a key is not simply the module name: the shell-session theme
+     * owns directory and file names (`home-terminal-panel`), while the route
+     * owns the slot key (`home-page`),
      * the `<section id>`, `data-page`, and the `pageMounters` key in `main.ts`.
      *
      * This file is a config dependency, so editing anything reachable from it —

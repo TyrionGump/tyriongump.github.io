@@ -12,7 +12,7 @@ export function renderSiteNavigation(): HtmlFragment {
   return html`
     <header class="site-navigation">
       <nav class="site-navigation-frame" aria-label="Primary">
-        <a class="site-navigation-wordmark" href="#home">
+        <a class="site-navigation-logo" href="#home">
           <span class="site-navigation-status-dot" aria-hidden="true"></span>${siteIdentity.handle}
         </a>
         <div class="site-navigation-links">

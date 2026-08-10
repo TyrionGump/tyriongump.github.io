@@ -1,5 +1,5 @@
 /**
- * Guards the lifetime primitive the rest of the site is built on.
+ * Guards the cleanup mechanism the rest of the site is built on.
  *
  * Nineteen files own their timers, intervals and listeners through a scope, so a
  * regression here does not fail loudly — it leaks an interval, or lets a torn

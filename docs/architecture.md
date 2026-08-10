@@ -103,11 +103,11 @@ src/
                 inline link text — stay in the render-* that lays them out
   styles/       tokens, themes, reset, keyframes + the cascade manifest
   routing/      hash router, route names, page lifecycle
-  animation/    DOM motion and lifetime primitives, no site knowledge.
-                Imports nothing outside itself
+  animation/    DOM motion, plus the cleanup and timing helpers it needs.
+                No site knowledge; imports nothing outside itself
   shared/       html templating, DOM helpers
   components/   one directory per component
-  main.ts       composition root — the only place things are wired together
+  main.ts       the only place things are wired together
 ```
 
 **Imports run one way:** `shared` → `animation` → `routing` → `content` →
@@ -129,8 +129,9 @@ different files.** `build/prerender-content-plugin.ts` imports
 
 **`animation/` earns its place by being skippable, not by being reused.** Four of
 its seven modules have exactly one caller, and that is fine. `cleanup-scope.ts` is
-a lifetime primitive rather than an animation; it lives there because everything
-in the directory needs it and it needs nothing itself. The router imports it too.
+not an animation at all — it is what shuts one down; it lives there because
+everything in the directory needs it and it needs nothing itself. The router
+imports it too.
 
 **`styles/index.css` `@import`s upward into `components/*.css`.** That is the one
 upward arrow in the repo, it is CSS rather than TypeScript, and it is deliberate:
@@ -176,8 +177,8 @@ shell returns its output in one beat; staggering reads as decoration.
 **Opening a commit holds the clicked row still.** Switching collapses the outgoing
 body instantly — the scroll anchor would otherwise chase a target moving a
 thousand pixels. Closing shrinks it over time instead, because folding that much
-height in one pass makes the browser clamp the scroll position, and clamping is
-lossy. See
+height in one pass makes the browser snap the scroll position back, and once it
+does the old position cannot be recovered. See
 [`commit-row-expansion.ts`](../src/components/work-git-graph/commit-row-expansion.ts).
 
 **Home replays on every visit; Work and Personal do not.** Arriving at Home

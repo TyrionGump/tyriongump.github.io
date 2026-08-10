@@ -27,7 +27,10 @@
 @import "../components/work-git-graph/work-git-graph.css";
 @import "../components/personal-page/personal-page.css";
 
-/* Global chrome, last: the console's trigger styles override the nav's and the
-   Personal page's rest states. */
+/* Overlays, last — a grouping, not a requirement. The console's two
+   `.is-console-open` trigger rules are the only place one component stylesheet
+   reaches into another, and neither depends on this position: naming two
+   classes already outranks the resting rules wherever it sits, and it sets the
+   exact values `:hover` sets, so their equal-weight tie has nothing to decide. */
 @import "../components/scroll-progress-ring/scroll-progress-ring.css";
 @import "../components/console-overlay/console-overlay.css";

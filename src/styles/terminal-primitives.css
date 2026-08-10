@@ -2,9 +2,9 @@
  * Pieces shared by every terminal surface on the site: the Home panel, the Work
  * command line, the Personal session, and the console overlay.
  *
- * These exist as one definition because the site's conceit is that all of it is
- * a single shell session seen from different angles — a caret that blinks at a
- * different rate in the console than on Home would break that.
+ * These exist as one definition because the site's central idea is that all of
+ * it is a single shell session seen from different angles — a caret that blinks
+ * at a different rate in the console than on Home would break that.
  */
 
 /** The blinking block cursor. */
@@ -18,13 +18,9 @@
   flex: none;
 }
 
-.caret.is-hidden {
-  display: none;
-}
-
 /**
- * The `❯` prompt glyph. One glyph, never a path — the surrounding chrome
- * already says where you are, and a path would just crowd the line that matters.
+ * The `❯` prompt glyph. One glyph, never a path — the page around it already
+ * says where you are, and a path would just crowd the line that matters.
  */
 .terminal-prompt-glyph {
   color: var(--palette-status);

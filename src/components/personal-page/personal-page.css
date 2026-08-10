@@ -1,9 +1,10 @@
 /**
  * Personal — prose mode.
  *
- * Reading measures are capped in `ch`, never px, so widening the site frame adds
- * margin rather than characters: 58ch for the bio, 52ch for the closing
- * statement, 14ch on the hero so it breaks into three deliberate lines.
+ * Line lengths are capped in `ch` — the width of one character — never px, so
+ * widening the site frame adds margin rather than characters per line: 58ch for
+ * the bio, 52ch for the closing statement, 14ch on the hero so it breaks into
+ * three deliberate lines.
  */
 
 .personal-page-frame {
@@ -102,14 +103,14 @@
   gap: 16px;
 }
 
-.personal-eyebrow {
+.personal-section-label {
   margin: 0;
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 400;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--text-eyebrow);
+  color: var(--text-section-label);
 }
 
 .personal-now {
@@ -167,7 +168,7 @@
 .personal-projects-note {
   margin: 0;
   font-size: 11px;
-  color: var(--text-chrome);
+  color: var(--text-detail);
 }
 
 .personal-inline-link {

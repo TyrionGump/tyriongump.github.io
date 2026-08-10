@@ -2,7 +2,7 @@
  * Selection behaviour for the Home menu.
  *
  * The options are real anchors, so clicking, middle-clicking and tabbing all
- * work without any of this. What this adds is the shell affordance on top:
+ * work without any of this. What this adds is the shell behaviour on top:
  * ↑/↓ move the highlight and Enter follows it, the way a real picker behaves.
  */
 

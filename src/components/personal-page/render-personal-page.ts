@@ -19,24 +19,24 @@ import {
   personalBioParagraphs,
   personalByline,
   personalHero,
-  type ProseRun,
+  type ProseSegment,
 } from "../../content/personal-page-content";
 import { projectsNewestFirst } from "../../content/projects";
 import { siteIdentity } from "../../content/site-identity";
 import { html, type HtmlFragment } from "../../shared/html-template";
 import { renderSiteFooter } from "../site-footer/render-site-footer";
 
-function renderProseRun(run: ProseRun): HtmlFragment {
-  if (!run.opensConsole) return html`${run.text}`;
+function renderProseSegment(segment: ProseSegment): HtmlFragment {
+  if (!segment.opensConsole) return html`${segment.text}`;
   return html`<button class="personal-console-trigger" type="button" data-console-trigger>
-    ${run.text}
+    ${segment.text}
   </button>`;
 }
 
 function renderNowBlock(): HtmlFragment {
   return html`
     <div class="personal-band-column">
-      <h2 class="personal-eyebrow">Now</h2>
+      <h2 class="personal-section-label">Now</h2>
       <dl class="personal-now">
         ${nowEntries.map(
           (entry) => html`
@@ -52,7 +52,7 @@ function renderNowBlock(): HtmlFragment {
 function renderProjectsBlock(): HtmlFragment {
   return html`
     <div class="personal-band-column">
-      <h2 class="personal-eyebrow">Projects</h2>
+      <h2 class="personal-section-label">Projects</h2>
       <ul class="personal-projects">
         ${projectsNewestFirst.map(
           (project) => html`
@@ -80,7 +80,7 @@ export function renderPersonalPage(): HtmlFragment {
       <div class="personal-bio">
         <p class="personal-bio-lead">${personalBioLead}</p>
         ${personalBioParagraphs.map(
-          (runs) => html`<p class="personal-bio-paragraph">${runs.map(renderProseRun)}</p>`,
+          (runs) => html`<p class="personal-bio-paragraph">${runs.map(renderProseSegment)}</p>`,
         )}
       </div>
 

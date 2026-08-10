@@ -6,8 +6,9 @@
  * between commits, removes a similar amount in the same layout pass. Without
  * this, the row you clicked jumps out from under the cursor.
  *
- * It lerp-follows rather than correcting once, because layout keeps moving after
- * the click — fonts settle, the body refits as the source viewer fills in. A
+ * Each frame it closes a fraction of the remaining gap rather than correcting
+ * once, because layout keeps moving after the click — fonts settle, the body
+ * refits as the source viewer fills in. A
  * single correction is right for one frame and wrong for the next thirty. And it
  * reads the real `window.scrollY` every frame: when the document shrinks the
  * browser clamps the scroll, and a tracked virtual position silently desyncs.

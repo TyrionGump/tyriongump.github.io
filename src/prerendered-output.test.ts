@@ -111,7 +111,7 @@ describe("every prerendered fragment", () => {
     for (const [tag] of externalLinks) expect(tag).toContain('rel="noreferrer noopener"');
   });
 
-  it("gives the global chrome the hooks its mount code requires", () => {
+  it("gives the site-wide overlays the hooks their mount code requires", () => {
     // `requireElement` throws on a miss, so a rename here is a blank page.
     const overlay = renderFragmentToMarkup(renderConsoleOverlay());
     for (const hook of [
@@ -144,8 +144,8 @@ describe("the document and the route list", () => {
     for (const route of routeNames) {
       // The pair, not the two halves separately: a slot that sits outside its
       // section satisfies the plugin and every other gate, and then ships an
-      // empty page. Route slots are named `<route>-page`; the three chrome slots
-      // are not — see the slot map in `vite.config.ts`.
+      // empty page. Route slots are named `<route>-page`; the three slots for
+      // the nav and the overlays are not — see the slot map in `vite.config.ts`.
       expect(documentMarkup).toMatch(
         new RegExp(`<section[^>]*data-page="${route}"[^>]*>\\s*<!--prerender:${route}-page-->`),
       );

@@ -8,9 +8,10 @@
  * being blank without.
  *
  * The prompt is a real `<input>` behind a fake caret, not a keystroke listener
- * on `window` keeping its own buffer. That approach loses paste, IME
- * composition, text selection and the on-screen keyboard on a phone; a real
- * input costs one `input` listener to mirror its value and gets all of it free.
+ * on `window` keeping its own buffer. That approach loses paste, the multi-key
+ * input methods used to type Chinese, Japanese and Korean, text selection and
+ * the on-screen keyboard on a phone; a real input costs one `input` listener to
+ * mirror its value and gets all of it free.
  *
  * Runs in Node at build time, so nothing here — or anything it imports — may touch the DOM.
  */

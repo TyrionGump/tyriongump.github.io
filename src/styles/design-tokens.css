@@ -31,7 +31,7 @@
      moves the accent, not the neutrals. */
   --text-display: #f2f6f3; /* display headlines */
   --text-primary: #edf1ec; /* primary text, project names */
-  --text-primary-soft: #e6ebe7; /* wordmark, active nav */
+  --text-primary-soft: #e6ebe7; /* logo, active nav */
   --text-primary-typed: #e4e8e3; /* typed terminal input */
   --text-lead: #c9d0cb; /* lead paragraphs */
   --text-config-value: #c8ccc6; /* config values */
@@ -41,10 +41,10 @@
   --text-terminal-output: #8f9892;
   --text-terminal-dim: #7f8983; /* dim lines inside a terminal panel */
   --text-meta-secondary: #8b948d;
-  --text-eyebrow: #79827b; /* uppercase section eyebrows */
+  --text-section-label: #79827b; /* the small uppercase label above a section heading */
   --text-console-glyph: #7c857e; /* console button, dim keys */
   --text-label: #6e776f; /* labels, years, dim meta */
-  --text-chrome: #5f6a63; /* panel chrome, hashes, tertiary meta */
+  --text-detail: #5f6a63; /* a panel's own frame and labels, hashes, faint meta */
   --text-faint: #4a504a; /* separator dots, tail log */
   --text-faintest: #3e453f;
   --text-hint-amber: #b79a6a; /* "tip", console warnings */
@@ -55,9 +55,9 @@
   --graph-rail: rgba(230, 235, 231, 0.24);
 
   /* ---- Layout ---------------------------------------------------------- */
-  /* One frame for every interior page: the column the footer hairline
-     measures. Reading measures are capped separately in `ch`, so widening this
-     adds margin rather than characters. */
+  /* One frame for every interior page: the column the footer hairline spans.
+     Line lengths are capped separately in `ch` (the width of one character), so
+     widening this adds margin rather than characters per line. */
   --site-column-width: 900px;
   --site-navigation-frame-width: 1160px;
   --site-navigation-height: 72px;

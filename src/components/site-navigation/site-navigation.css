@@ -16,12 +16,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /* `space-between` alone lets the wordmark and the first link touch once the
+  /* `space-between` alone lets the logo and the first link touch once the
      viewport is narrow enough that the free space runs out. */
   gap: 16px;
 }
 
-.site-navigation-wordmark {
+.site-navigation-logo {
   display: flex;
   align-items: center;
   gap: 10px;

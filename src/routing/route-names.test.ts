@@ -1,6 +1,7 @@
 /**
- * Hash parsing has to be total: the hash is user-editable, so every possible
- * string needs an answer. The CSS fallback rule in `site-layout.css`
+ * Hash parsing must answer for every possible input: anyone can type anything
+ * into the address bar, so no string may be left without a route. The CSS
+ * fallback rule in `site-layout.css`
  * (`html:not(:has(.site-page:target))`) assumes the same "anything unrecognised
  * means home" behaviour — if these two ever disagree, the page shown before the
  * bundle loads differs from the one shown after.

@@ -18,7 +18,7 @@ export interface MountedPage {
   /**
    * Runs when the router comes back to a page that is still mounted. Use it for
    * work that cannot be done while the page is hidden — anything that needs to
-   * measure, since a displaced element reports a height of zero.
+   * measure, since a hidden element reports a height of zero.
    */
   readonly onReturn?: () => void;
 }
