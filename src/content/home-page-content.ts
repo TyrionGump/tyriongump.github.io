@@ -7,6 +7,7 @@
  */
 
 import type { RouteName } from "../routing/route-names";
+import { siteIdentity } from "./site-identity";
 
 /** Which type role a terminal output line plays. Maps 1:1 to a CSS class. */
 export type TerminalLineRole = "greeting" | "body" | "status";
@@ -31,11 +32,15 @@ export const homeIntroCommand = "whoami";
  */
 export const homeIntroOutput: readonly TerminalOutputLine[] = [
   { kind: "blank-line" },
-  { kind: "text", role: "greeting", text: "Hi, I'm Andrew." },
+  { kind: "text", role: "greeting", text: `Hi, I'm ${siteIdentity.displayName}.` },
   { kind: "text", role: "body", text: "I build software end to end — the database underneath," },
   { kind: "text", role: "body", text: "the API in the middle, and the screen you actually use." },
   { kind: "blank-line" },
-  { kind: "text", role: "status", text: "Melbourne, AU · open to work" },
+  {
+    kind: "text",
+    role: "status",
+    text: `${siteIdentity.location} · ${siteIdentity.availability}`,
+  },
 ];
 
 /**

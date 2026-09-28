@@ -17,7 +17,7 @@ export interface ProseSegment {
 
 export const personalHero = "I’d rather delete code than add it.";
 
-export const personalByline = `${siteIdentity.handle} · ${siteIdentity.role} · melbourne, au`;
+export const personalByline = `${siteIdentity.handle} · ${siteIdentity.role} · ${siteIdentity.location.toLowerCase()}`;
 
 export const personalBioLead =
   "I started on backends and kept following problems until I’d touched every layer.";
@@ -46,7 +46,11 @@ export const nowEntries: readonly NowEntry[] = [
   { label: "based", value: siteIdentity.location },
   { label: "daily", value: "Go, Rust, TypeScript" },
   { label: "learning", value: "Distributed clocks" },
-  { label: "status", value: "Open to work", isStatus: true },
+  {
+    label: "status",
+    value: siteIdentity.availability.charAt(0).toUpperCase() + siteIdentity.availability.slice(1),
+    isStatus: true,
+  },
 ];
 
 export const contactStatement =

@@ -10,8 +10,9 @@
 #
 # Neither check writes to your files: a failure tells you what to run.
 
-repo=$(git rev-parse --show-toplevel) || exit 1
-cd "$repo" || exit 1
+cd "$(git rev-parse --show-toplevel)" || exit 1
+# pwd, not git's path: on Windows that is `D:/...`, whose colon breaks PATH.
+repo=$(pwd)
 
 nvm_dir=${NVM_DIR:-$HOME/.nvm}
 

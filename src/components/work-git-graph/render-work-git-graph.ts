@@ -16,6 +16,7 @@
 
 import { projects, workGraphProjectIds, type Project } from "../../content/projects";
 import { siteIdentity } from "../../content/site-identity";
+import { workHeadlineLines, workIntro } from "../../content/work-page-content";
 import { renderSiteFooter } from "../site-footer/render-site-footer";
 import { html, type HtmlFragment } from "../../shared/html-template";
 import { buildStatBars, formatLineCount, formatMetricValue } from "./commit-formatting";
@@ -50,11 +51,10 @@ function renderHeadRow(): HtmlFragment {
       </div>
       <div class="graph-row-content graph-head-content" data-graph-text>
         <p class="graph-head-ref">HEAD → main</p>
-        <h1 class="graph-head-headline">Two systems.<br />Both still running.</h1>
-        <p class="graph-head-intro">
-          Payments infrastructure and fleet orchestration. Open a branch to read the problem, what
-          it took, and the file itself.
-        </p>
+        <h1 class="graph-head-headline">
+          ${workHeadlineLines.map((line, index) => (index === 0 ? line : html`<br />${line}`))}
+        </h1>
+        <p class="graph-head-intro">${workIntro}</p>
       </div>
     </div>
   `;

@@ -1,0 +1,4 @@
+# Force LF on every platform; oxfmt's format check fails on CRLF checkouts.
+* text=auto eol=lf
+
+*.woff2 binary

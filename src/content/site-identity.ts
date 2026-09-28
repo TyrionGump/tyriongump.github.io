@@ -33,10 +33,3 @@ export const technologies = [
   "k8s",
   "terraform",
 ] as const;
-
-export const siteMetadata = {
-  title: "Andrew — Software Engineer",
-  description:
-    "Andrew builds software end to end — the database underneath, the API in the middle, " +
-    "and the screen you actually use. Melbourne, AU.",
-} as const;

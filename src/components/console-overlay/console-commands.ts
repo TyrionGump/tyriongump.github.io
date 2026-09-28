@@ -122,7 +122,8 @@ export function runConsoleCommand(
     case "whoami":
       return [
         highlighted(
-          html`${siteIdentity.handle} ${separator} ${siteIdentity.role} ${separator} melbourne, au`,
+          html`${siteIdentity.handle} ${separator} ${siteIdentity.role} ${separator}
+          ${siteIdentity.location.toLowerCase()}`,
         ),
       ];
 
