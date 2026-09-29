@@ -145,6 +145,25 @@ to about 26 KB. Dependabot watches the swup packages for this reason.
 
 ---
 
+## Shiki highlights the code, at build time only
+
+The source viewer used a small hand-written tokenizer. It worked only for the
+snippets in `projects.ts`. Shiki uses the same grammars as VS Code, so it reads
+any TypeScript correctly, and it is the usual choice of current static-site
+tools. In September 2026 it had about 26 million weekly downloads and a release
+in August.
+
+It runs in the prerender step, so visitors download nothing more. It uses the
+JavaScript regex engine and only the TypeScript grammar, which keeps its API
+synchronous and the build fast. The build went from about 0.3 to about 0.7
+seconds.
+
+A small theme maps Shiki's token types to CSS variables in `work-page.css`, so
+the stylesheet still owns the colours. The markup comes from our own `html`
+template, so every token is escaped.
+
+---
+
 ## The cascade is one ordered list, not `@layer`
 
 `@layer` sets the cascade order, but it does not import anything. Every stylesheet
