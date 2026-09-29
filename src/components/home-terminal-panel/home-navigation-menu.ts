@@ -9,6 +9,9 @@
 import type { CleanupScope } from "../../animation/cleanup-scope";
 import { findAllElements } from "../../shared/dom-queries";
 
+const INTERACTIVE_ELEMENTS =
+  'a[href], button, input, select, textarea, [contenteditable]:not([contenteditable="false"])';
+
 export function activateHomeNavigationMenu(menu: HTMLElement, scope: CleanupScope): void {
   const options = findAllElements<HTMLAnchorElement>(menu, "[data-home-menu-option]");
   if (options.length === 0) return;
@@ -44,9 +47,16 @@ export function activateHomeNavigationMenu(menu: HTMLElement, scope: CleanupScop
   const isMenuOnScreen = (): boolean =>
     menu.closest(".site-page")?.classList.contains("is-active") ?? false;
 
+  const isKeyForAnotherControl = (event: KeyboardEvent): boolean => {
+    if (!(event.target instanceof Element)) return false;
+    const control = event.target.closest(INTERACTIVE_ELEMENTS);
+    return control !== null && !menu.contains(control);
+  };
+
   scope.addEventListener<KeyboardEvent>(window, "keydown", (event) => {
     if (!isMenuOnScreen()) return;
     if (event.metaKey || event.ctrlKey || event.altKey) return;
+    if (isKeyForAnotherControl(event)) return;
 
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
