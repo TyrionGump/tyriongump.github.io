@@ -1,5 +1,3 @@
-import "./styles/index.css";
-
 import { mountConsoleOverlay } from "./chrome/console/mount-console-overlay";
 import { mountScrollProgressRing } from "./chrome/scroll-ring/mount-scroll-progress-ring";
 import { requireElement } from "./lib/dom-queries";
