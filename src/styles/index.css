@@ -26,6 +26,7 @@
 @import "../pages/home/home-page.css";
 @import "../pages/work/work-page.css";
 @import "../pages/personal/personal-page.css";
+@import "../pages/not-found/not-found-page.css";
 
 /* Overlays, last — a grouping, not a requirement. The console's two
    `.is-console-open` trigger rules are the only place one component stylesheet

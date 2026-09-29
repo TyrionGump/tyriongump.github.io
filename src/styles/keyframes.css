@@ -67,7 +67,8 @@
     opacity: 1;
   }
 
-  .home-terminal-panel {
+  .home-terminal-panel,
+  .site-page {
     animation: none;
   }
 }

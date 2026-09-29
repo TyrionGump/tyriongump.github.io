@@ -14,8 +14,17 @@ import { routeHref, type RouteName } from "../../site-pages";
 import { findAllElements, findElement, requireElement } from "../../lib/dom-queries";
 import { appendFragment } from "../../lib/dom-rendering";
 import { html, type HtmlFragment } from "../../lib/html-template";
+import { readSessionValue, writeSessionValue } from "../../lib/session-store";
 import { runConsoleCommand, type ConsoleCommandContext } from "./console-commands";
 import { createConsoleVitals } from "./console-vitals";
+
+const HISTORY_SESSION_KEY = "console-history";
+const MAXIMUM_HISTORY_LENGTH = 50;
+
+function readHistory(): readonly string[] {
+  const stored = readSessionValue(HISTORY_SESSION_KEY);
+  return Array.isArray(stored) ? stored.filter((entry) => typeof entry === "string") : [];
+}
 
 export function mountConsoleOverlay(overlay: HTMLElement): CleanupFunction {
   const scope = new CleanupScope();
@@ -37,6 +46,7 @@ export function mountConsoleOverlay(overlay: HTMLElement): CleanupFunction {
 
   let isOpen = false;
   let hasBooted = false;
+  let history = readHistory();
   /** Where focus came from, so closing puts it back rather than dropping it on <body>. */
   let elementToRestoreFocusTo: HTMLElement | null = null;
 
@@ -128,32 +138,47 @@ export function mountConsoleOverlay(overlay: HTMLElement): CleanupFunction {
     },
   };
 
+  const appendCommand = (raw: string, context: ConsoleCommandContext): void => {
+    const trimmed = raw.trim();
+    if (!trimmed) return;
+    // Echoed even when it is not understood: a shell shows you what it heard.
+    appendFragment(
+      output,
+      html`<div class="console-line is-echo">
+        <span class="terminal-prompt-glyph">❯</span
+        ><span class="console-echo-text">${trimmed}</span>
+      </div>`,
+    );
+    appendLines(runConsoleCommand(trimmed, context));
+    appendFragment(output, html`<div class="console-gap"></div>`);
+    setStatus(`exec ${trimmed}`);
+  };
+
   const submit = (): void => {
     const raw = input.value;
-    const trimmed = raw.trim();
-
-    // The command is echoed even when it is not understood — a shell shows you
-    // what it heard.
-    if (trimmed) {
-      appendFragment(
-        output,
-        html`<div class="console-line is-echo">
-          <span class="terminal-prompt-glyph">❯</span
-          ><span class="console-echo-text">${trimmed}</span>
-        </div>`,
-      );
+    if (raw.trim()) {
+      history = [...history, raw.trim()].slice(-MAXIMUM_HISTORY_LENGTH);
+      writeSessionValue(HISTORY_SESSION_KEY, history);
     }
-
-    appendLines(runConsoleCommand(raw, commandContext));
-    if (trimmed) {
-      appendFragment(output, html`<div class="console-gap"></div>`);
-      setStatus(`exec ${trimmed}`);
-    }
-
+    appendCommand(raw, commandContext);
     input.value = "";
     typed.textContent = "";
     scrollToEnd();
   };
+
+  // A new page load rebuilds the transcript by running the history again. Only
+  // `clear` has an effect, so no command navigates or opens a tab twice.
+  if (history.length > 0) {
+    const replayContext: ConsoleCommandContext = {
+      ...commandContext,
+      closeConsole: () => {},
+      navigateTo: () => {},
+      openExternalUrl: () => {},
+    };
+    hasBooted = true;
+    printBootBanner();
+    for (const command of history) appendCommand(command, replayContext);
+  }
 
   scope.addEventListener(input, "input", () => {
     typed.textContent = input.value;

@@ -25,24 +25,8 @@
           {
             "patterns": [
               {
-                "regex": "(\\.\\./)+(src/)?(routing/|content/|chrome/|pages/|site-pages)",
+                "regex": "(\\.\\./)+(src/)?(content/|chrome/|pages/|site-pages)",
                 "message": "lib/ is the floor: it knows nothing about this site."
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "files": ["src/routing/**"],
-      "rules": {
-        "no-restricted-imports": [
-          "error",
-          {
-            "patterns": [
-              {
-                "regex": "(\\.\\./)+(src/)?(content|chrome|pages)/",
-                "message": "routing/ may not reach content, chrome or pages."
               }
             ]
           }
@@ -113,7 +97,7 @@
           {
             "patterns": [
               {
-                "regex": "(\\.\\./)*src/(lib/motion|routing|content|styles)/",
+                "regex": "(\\.\\./)*src/(lib/motion|content|styles)/",
                 "message": "build/ runs in Node with no DOM. It may import only lib/html-template and render-* modules."
               },
               {

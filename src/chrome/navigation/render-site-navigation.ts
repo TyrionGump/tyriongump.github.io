@@ -1,15 +1,9 @@
-/**
- * The sticky top navigation. Present on every route.
- *
- * Pure markup — no DOM access — so this runs at build time and the nav ships in
- * the served HTML rather than being drawn by script.
- */
-
 import { siteIdentity } from "../../content/site-identity";
 import { html, type HtmlFragment } from "../../lib/html-template";
-import { defaultRouteName, routeHref, sitePages } from "../../site-pages";
+import { defaultRouteName, routeHref, sitePages, type RouteName } from "../../site-pages";
 
-export function renderSiteNavigation(): HtmlFragment {
+/** `currentRoute` is null on pages outside the route list, such as the 404 page. */
+export function renderSiteNavigation(currentRoute: RouteName | null): HtmlFragment {
   return html`
     <header class="site-navigation">
       <nav class="site-navigation-frame" aria-label="Primary">
@@ -24,7 +18,7 @@ export function renderSiteNavigation(): HtmlFragment {
                 html`<a
                   class="site-navigation-link"
                   href="${routeHref(page.route)}"
-                  data-navigation-route="${page.route}"
+                  aria-current="${page.route === currentRoute ? "page" : "false"}"
                   >${page.label}</a
                 >`,
             )}

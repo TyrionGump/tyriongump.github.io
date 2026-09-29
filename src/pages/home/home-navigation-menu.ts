@@ -39,22 +39,14 @@ export function activateHomeNavigationMenu(menu: HTMLElement, scope: CleanupScop
 
   paintSelection();
 
-  /**
-   * The listener is on `window` so the keys work without the visitor having to
-   * click into anything first — but the menu only owns the arrow keys while its
-   * page is the one on screen.
-   */
-  const isMenuOnScreen = (): boolean =>
-    menu.closest(".site-page")?.classList.contains("is-active") ?? false;
-
   const isKeyForAnotherControl = (event: KeyboardEvent): boolean => {
     if (!(event.target instanceof Element)) return false;
     const control = event.target.closest(INTERACTIVE_ELEMENTS);
     return control !== null && !menu.contains(control);
   };
 
+  // On window, so the keys work without a click into the page first.
   scope.addEventListener<KeyboardEvent>(window, "keydown", (event) => {
-    if (!isMenuOnScreen()) return;
     if (event.metaKey || event.ctrlKey || event.altKey) return;
     if (isKeyForAnotherControl(event)) return;
 

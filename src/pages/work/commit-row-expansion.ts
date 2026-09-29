@@ -20,7 +20,7 @@
  *    lossy — once it happens the position cannot be recovered.
  */
 
-import { CleanupScope, type CleanupFunction } from "../../lib/cleanup-scope";
+import { CleanupScope } from "../../lib/cleanup-scope";
 import { holdElementInPlace, type ScrollAnchor } from "../../lib/motion/hold-element-in-place";
 import { projects, type ProjectId } from "../../content/projects";
 import { findAllElements, findElement, requireElement } from "../../lib/dom-queries";
@@ -37,20 +37,18 @@ const COLLAPSE_TRANSITION_CLEANUP_MS = 500;
 
 const commitIdOf = (row: HTMLElement): ProjectId => row.dataset["commit"] as ProjectId;
 
-export interface CommitExpansionController {
-  /**
-   * Re-measures the open commit. Needed on resize, and on returning to the page:
-   * a hidden element reports a height of zero, so the fit made while the page
-   * was off-screen would have clipped the body away.
-   */
-  refitOpenCommit(): void;
+export interface CommitExpansionOptions {
+  /** Opened at once, with no animation, as if it had never closed. */
+  readonly initialOpenCommitId: ProjectId | null;
+  readonly onOpenCommitChange: (id: ProjectId | null) => void;
 }
 
 export function mountCommitExpansion(
   graphRoot: HTMLElement,
   drawController: GraphDrawController,
   scope: CleanupScope,
-): CommitExpansionController {
+  options: CommitExpansionOptions,
+): void {
   const rows = findAllElements(graphRoot, "[data-commit]");
   let openCommitId: ProjectId | null = null;
   let scrollAnchor: ScrollAnchor | null = null;
@@ -90,7 +88,7 @@ export function mountCommitExpansion(
     body.style.maxHeight = "0px";
   };
 
-  const setOpen = (nextId: ProjectId | null): void => {
+  const setOpen = (nextId: ProjectId | null, animate: boolean): void => {
     const previousId = openCommitId;
     const isFullClose = nextId === null && previousId !== null;
     openCommitId = nextId;
@@ -123,6 +121,8 @@ export function mountCommitExpansion(
       // steadily in one direction instead of stuttering. The reveal is carried
       // by the inner content rising, not by the height growing.
       fitBody(body);
+      requestAnimationFrame(() => fitBody(body));
+      if (!animate) continue;
 
       const inner = findElement(body, "[data-commit-body-inner]");
       if (inner) {
@@ -137,8 +137,6 @@ export function mountCommitExpansion(
         scope: detailScope,
         onContentGrew: () => fitBody(body),
       });
-
-      requestAnimationFrame(() => fitBody(body));
     }
   };
 
@@ -156,7 +154,8 @@ export function mountCommitExpansion(
       const nextId = openCommitId === id ? null : id;
       const holdTop = head.getBoundingClientRect().top;
 
-      setOpen(nextId);
+      setOpen(nextId, true);
+      options.onOpenCommitChange(nextId);
 
       if (previousId !== null && previousId !== id) {
         // Switching: the outgoing body collapsed in the same layout pass and
@@ -187,7 +186,7 @@ export function mountCommitExpansion(
   for (const row of rows) resizeObserver.observe(row);
   scope.onDispose(() => resizeObserver.disconnect());
 
-  const refitOpenCommit: CleanupFunction = () => {
+  const refitOpenCommit = (): void => {
     if (openCommitId === null) return;
     const row = rows.find((candidate) => commitIdOf(candidate) === openCommitId);
     const body = row ? findElement(row, "[data-commit-body]") : null;
@@ -198,7 +197,5 @@ export function mountCommitExpansion(
 
   // Script owns the collapsed state from here: the markup ships expanded so it
   // reads without JavaScript, and this is the moment it becomes an accordion.
-  setOpen(null);
-
-  return { refitOpenCommit };
+  setOpen(options.initialOpenCommitId, false);
 }
