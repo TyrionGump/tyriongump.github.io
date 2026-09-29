@@ -1,4 +1,5 @@
 import { CleanupScope, type CleanupFunction } from "../../lib/cleanup-scope";
+import { navigateTo } from "../../lib/navigation";
 import { routeHref, type RouteName } from "../../site-pages";
 import { findAllElements, requireElement } from "../../lib/dom-queries";
 import { appendFragment } from "../../lib/dom-rendering";
@@ -15,7 +16,13 @@ function readHistory(): readonly string[] {
   return Array.isArray(stored) ? stored.filter((entry) => typeof entry === "string") : [];
 }
 
-export function mountConsoleOverlay(overlay: HTMLElement): CleanupFunction {
+export interface ConsoleOverlayController {
+  /** Call after new markup arrives, so its triggers show whether the console is open. */
+  syncTriggers(): void;
+  dispose: CleanupFunction;
+}
+
+export function mountConsoleOverlay(overlay: HTMLElement): ConsoleOverlayController {
   const scope = new CleanupScope();
 
   const body = requireElement(overlay, "[data-console-body]");
@@ -34,6 +41,13 @@ export function mountConsoleOverlay(overlay: HTMLElement): CleanupFunction {
   );
 
   let isOpen = false;
+
+  const syncTriggers = (): void => {
+    for (const trigger of findAllElements(document, "[data-console-trigger]")) {
+      trigger.classList.toggle("is-console-open", isOpen);
+      trigger.setAttribute("aria-expanded", String(isOpen));
+    }
+  };
   let hasBooted = false;
   let history = readHistory();
   let elementToRestoreFocusTo: HTMLElement | null = null;
@@ -84,10 +98,7 @@ export function mountConsoleOverlay(overlay: HTMLElement): CleanupFunction {
     // The closed overlay only slides off-screen. `inert` keeps its prompt out of the tab order.
     overlay.toggleAttribute("inert", !isOpen);
 
-    for (const trigger of findAllElements(document, "[data-console-trigger]")) {
-      trigger.classList.toggle("is-console-open", isOpen);
-      trigger.setAttribute("aria-expanded", String(isOpen));
-    }
+    syncTriggers();
 
     if (!isOpen) {
       vitals.stop();
@@ -114,7 +125,7 @@ export function mountConsoleOverlay(overlay: HTMLElement): CleanupFunction {
     closeConsole: () => setOpen(false),
     navigateTo: (route: RouteName) => {
       setStatus(`route → ${route}`);
-      window.location.assign(routeHref(route));
+      navigateTo(routeHref(route));
       setOpen(false);
     },
     openExternalUrl: (url) => {
@@ -188,13 +199,13 @@ export function mountConsoleOverlay(overlay: HTMLElement): CleanupFunction {
     setOpen(true);
   });
 
-  for (const trigger of findAllElements(document, "[data-console-trigger]")) {
-    trigger.setAttribute("aria-expanded", "false");
-    scope.addEventListener(trigger, "click", (event) => {
-      event.preventDefault();
-      setOpen(!isOpen);
-    });
-  }
+  // Delegated, so triggers that arrive with a new page work too.
+  scope.addEventListener(document, "click", (event) => {
+    if (!(event.target instanceof Element) || !event.target.closest("[data-console-trigger]"))
+      return;
+    event.preventDefault();
+    setOpen(!isOpen);
+  });
 
   scope.addEventListener(body, "click", (event) => {
     if (!isOpen) return;
@@ -203,5 +214,6 @@ export function mountConsoleOverlay(overlay: HTMLElement): CleanupFunction {
     input.focus({ preventScroll: true });
   });
 
-  return () => scope.dispose();
+  syncTriggers();
+  return { syncTriggers, dispose: () => scope.dispose() };
 }

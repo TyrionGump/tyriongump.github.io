@@ -92,10 +92,35 @@ missing from the list, or if the list names a file that does not exist.
 
 ---
 
+## Page changes in place
+
+[swup](https://swup.js.org) changes pages without a page load. On a click, it
+fetches the next page and replaces the navigation and `<main>`. Its plugins
+update the `<head>` and `<html data-page>`, announce the new page to screen
+readers, reset the focus as a page load would, restore the scroll position, and
+fetch pages when the visitor points at a link.
+
+- Only [`mount-page-transitions.ts`](../src/chrome/page-transitions/mount-page-transitions.ts)
+  imports swup. Delete it and its call in `main.ts`, and every page change is a
+  normal page load again.
+- Script starts a page change with `navigateTo()` from
+  [`lib/navigation.ts`](../src/lib/navigation.ts). swup takes it over when it
+  runs.
+- Each page mount returns a cleanup function. `main.ts` calls it before swup
+  replaces the page, and mounts the new page after.
+- The console is outside the replaced markup, so it stays open and keeps its
+  transcript.
+
+Links opened in a new tab, a refresh, and visits without JavaScript still load
+real pages.
+
+---
+
 ## State across page loads
 
-Each page change is a new page load. Two things must survive it, so they are kept
-in `sessionStorage` through [`lib/session-store.ts`](../src/lib/session-store.ts):
+A refresh or a new tab is a real page load. Two things must survive it, so they
+are kept in `sessionStorage` through
+[`lib/session-store.ts`](../src/lib/session-store.ts):
 
 - **Work.** The graph draws once in each session. A return visit shows it
   finished, and the commit that was open is open again.
@@ -119,7 +144,8 @@ src/
   lib/          html templating, DOM helpers, CleanupScope, session store,
                 and motion/. Knows nothing about this site.
   content/      page text and data
-  chrome/       on every page: navigation, footer, console, scroll ring
+  chrome/       on every page: navigation, footer, console, scroll ring,
+                and the in-place page changes
   pages/        one folder per page: home/, work/, personal/, not-found/
   styles/       tokens, reset, keyframes, layout, and the cascade list
 tests/e2e/      Playwright tests, run against the production build

@@ -1,5 +1,5 @@
 import { projectIds, type ProjectId } from "../../content/projects";
-import { CleanupScope } from "../../lib/cleanup-scope";
+import { CleanupScope, type CleanupFunction } from "../../lib/cleanup-scope";
 import { requireElement } from "../../lib/dom-queries";
 import { prefersReducedMotion } from "../../lib/motion/motion-preference";
 import { typeTextIntoElement, type TypingSpeed } from "../../lib/motion/type-into-element";
@@ -25,7 +25,7 @@ function readState(): WorkPageState {
   return { hasDrawn: stored?.hasDrawn === true, openCommitId };
 }
 
-export function mountWorkPage(main: HTMLElement): void {
+export function mountWorkPage(main: HTMLElement): CleanupFunction {
   const scope = new CleanupScope();
   const graphRoot = requireElement(main, "[data-work-graph]");
   const command = requireElement(main, "[data-work-command]");
@@ -55,4 +55,6 @@ export function mountWorkPage(main: HTMLElement): void {
     initialOpenCommitId: state.openCommitId,
     onOpenCommitChange: (openCommitId) => saveState({ openCommitId }),
   });
+
+  return () => scope.dispose();
 }

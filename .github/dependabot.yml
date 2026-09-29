@@ -2,10 +2,23 @@ version: 2
 
 updates:
   # GitHub retires old action majors; this catches it before a publish fails.
-  # npm is not watched: it is all devDependencies, and the PR noise would bury this.
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
     commit-message:
       prefix: ci
+
+  # Only swup ships to visitors. The dev tools are not watched: the PR noise would bury this.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    allow:
+      - dependency-name: "swup"
+      - dependency-name: "@swup/*"
+    groups:
+      swup:
+        patterns: ["swup", "@swup/*"]
+    commit-message:
+      prefix: deps

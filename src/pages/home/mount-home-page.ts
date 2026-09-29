@@ -1,4 +1,4 @@
-import { CleanupScope } from "../../lib/cleanup-scope";
+import { CleanupScope, type CleanupFunction } from "../../lib/cleanup-scope";
 import { prefersReducedMotion } from "../../lib/motion/motion-preference";
 import { siteIdentity } from "../../content/site-identity";
 import { findElement, requireElement } from "../../lib/dom-queries";
@@ -42,8 +42,9 @@ function startPanelFocusDimming(panel: HTMLElement, scope: CleanupScope): void {
   setWindowFocused(true);
 }
 
-export function mountHomePage(main: HTMLElement): void {
+export function mountHomePage(main: HTMLElement): CleanupFunction {
   const scope = new CleanupScope();
+  const dispose = (): void => scope.dispose();
   const panel = requireElement(main, "[data-home-terminal-panel]");
 
   startPanelClock(panel, scope);
@@ -53,7 +54,7 @@ export function mountHomePage(main: HTMLElement): void {
 
   if (prefersReducedMotion()) {
     activateHomeNavigationMenu(requireElement(bakedTranscript, "[data-home-terminal-menu]"), scope);
-    return;
+    return dispose;
   }
 
   // The baked copy stays in the layout to size the panel under the animated copy.
@@ -69,4 +70,6 @@ export function mountHomePage(main: HTMLElement): void {
   void playHomeIntroSequence(stage, scope).then((menu) => {
     activateHomeNavigationMenu(menu, scope);
   });
+
+  return dispose;
 }

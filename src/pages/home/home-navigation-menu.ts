@@ -1,5 +1,6 @@
 import type { CleanupScope } from "../../lib/cleanup-scope";
 import { findAllElements } from "../../lib/dom-queries";
+import { navigateTo } from "../../lib/navigation";
 
 const INTERACTIVE_ELEMENTS =
   'a[href], button, input, select, textarea, [contenteditable]:not([contenteditable="false"])';
@@ -53,7 +54,7 @@ export function activateHomeNavigationMenu(menu: HTMLElement, scope: CleanupScop
       const selected = options[selectedIndex];
       if (!selected) return;
       event.preventDefault();
-      window.location.assign(selected.href);
+      navigateTo(selected.href);
     }
   });
 }

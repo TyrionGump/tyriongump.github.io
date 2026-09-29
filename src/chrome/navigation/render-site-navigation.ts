@@ -5,7 +5,7 @@ import { defaultRouteName, routeHref, sitePages, type RouteName } from "../../si
 /** `currentRoute` is null on pages outside the route list, such as the 404 page. */
 export function renderSiteNavigation(currentRoute: RouteName | null): HtmlFragment {
   return html`
-    <header class="site-navigation">
+    <header class="site-navigation" data-site-navigation>
       <nav class="site-navigation-frame" aria-label="Primary">
         <a class="site-navigation-logo" href="${routeHref(defaultRouteName)}">
           <span class="site-navigation-status-dot" aria-hidden="true"></span>${siteIdentity.handle}
