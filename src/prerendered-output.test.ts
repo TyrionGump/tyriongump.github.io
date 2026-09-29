@@ -155,6 +155,13 @@ describe("each page's head", () => {
     expect(new Set(sitePages.map((page) => page.title)).size).toBe(sitePages.length);
   });
 
+  // Imported from script instead, the dev server paints the page before its styles arrive.
+  it("links the stylesheet from every page's head", () => {
+    for (const pageId of [...sitePages.map((page) => page.route), notFoundPageId]) {
+      expect(head(pageId)).toContain('<link rel="stylesheet" href="/src/styles/index.css" />');
+    }
+  });
+
   it("keeps the 404 page out of search results", () => {
     expect(head(notFoundPageId)).toContain('<meta name="robots" content="noindex" />');
     expect(head(notFoundPageId)).not.toContain("canonical");

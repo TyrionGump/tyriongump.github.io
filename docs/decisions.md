@@ -186,8 +186,9 @@ Nothing in `.oxlintrc.json` weakens a rule. Everything there is additive: the
 patterns that enforce the import direction described in
 [architecture.md](architecture.md). Before that config existed the ordering was a
 claim in prose; now `lib/` reaching into `content/` fails CI with a message
-naming the rule it broke. `import/no-unassigned-import` is the single `"off"`,
-because `main.ts` imports the stylesheet for its side effect and that is correct.
+naming the rule it broke. `import/no-unassigned-import` also stops script from
+importing CSS. Each page links the stylesheet from its `<head>` instead. An import
+from script makes the dev server paint each page before its styles arrive.
 
 Three things to know before editing those overrides:
 
