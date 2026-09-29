@@ -70,11 +70,81 @@ chose between, so carrying them would be dead code behind an option nothing sets
 
 ---
 
+## One palette
+
+The design had four alternate themes. Nothing on the site could select them, so
+they were deleted. Each colour is now defined once in `design-tokens.css`, and
+translucent uses mix it with `color-mix()`.
+
+---
+
 ## The scrollbar's transparency fade is not ported
 
 The design animates `scrollbar-color` every frame while scrolling. It is
 undocumented, and
 it largely duplicates what macOS overlay scrollbars already do on their own.
+
+---
+
+## One real HTML page per route, not hash routing
+
+The site used to be one document with hash URLs: `/#work`, `/#personal`. Now each
+page is its own HTML file at a real path.
+
+Hash routing cost three things:
+
+- **Every shared link previewed as Home.** Link-preview bots ignore the part after
+  `#` and do not run script. There was one `<title>` and no share tags.
+- **Screen readers heard nothing on a page change.** A real page load announces
+  the new page and resets focus. A hash router must do both by hand, and this one
+  did neither.
+- **The skip link had to be a script button**, because any `#target` changed the
+  route.
+
+The reason for hash routing was also false. GitHub Pages serves `work/index.html`
+for `/work/`, so real paths need no rewrite rules and no `404.html` trick.
+
+What the change cost:
+
+- Each page change is a full load. View transitions make it smooth where the
+  browser supports them. The dark background comes from the render-blocking
+  stylesheet, so there is no white flash.
+- Work and the console lost their in-memory state. `sessionStorage` now keeps the
+  small part that matters. See [architecture.md](architecture.md).
+- Old `/#work` links needed a redirect. An inline script in Home's `<head>` does
+  it.
+
+A client-side router on top of real pages is still possible later, as an extra
+layer. It is not needed now.
+
+---
+
+## The cascade is one ordered list, not `@layer`
+
+`@layer` sets the cascade order, but it does not import anything. Every stylesheet
+must still be imported from somewhere, so the list in `styles/index.css` and the
+test that checks it would both stay. `@layer` would only add a wrapper to every
+file.
+
+---
+
+## One rule for script hooks, not a hooks file for each component
+
+A `hooks.ts` file for each component would hold the `data-*` names that its render
+and mount code share. It adds one more file to follow for each component. One
+rule gives most of the same safety: script finds elements only through `data-*`
+attributes, and `script-hooks.test.ts` fails on any lookup by class. `requireElement`
+throws when a required hook is missing.
+
+---
+
+## Content edits restart the dev server
+
+`vite.config.ts` imports the renderers, and the renderers import `src/content/`.
+So Vite treats the content as part of the config, and restarts the dev server when
+it changes. The restart takes about one second. A fix would load the renderers
+through Vite's module runner instead. That is not worth the extra moving part for
+a one-second wait.
 
 ---
 
@@ -86,6 +156,12 @@ the only version this project is actually tested on. The `engines` field says
 nvm, note that its lazy shell shim does not load in non-interactive shells, so
 scripts and editors may find whatever `node` is on the bare `PATH` instead. A
 `v16` on `PATH` fails on this toolchain in ways that do not name the cause.
+
+**Playwright** tests the behaviour that Node cannot: keyboard handling, focus,
+page loads and animation. The tests run against the production build. The test
+server builds first, and the build takes about a second, so a stale `dist/` can
+never pass. The tests use reduced motion by default, so they see final states at
+once. The tests that need motion turn it back on.
 
 **TypeScript 7** is the native (Go) compiler. It is a drop-in for `tsc --noEmit`
 here and type-checks the project in about 0.15s. Nothing else in the toolchain

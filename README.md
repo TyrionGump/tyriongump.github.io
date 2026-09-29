@@ -40,7 +40,9 @@ type-checks, tests, builds and publishes `dist/`.
 
 ## Docs
 
-- [architecture.md](docs/architecture.md) — the prerender pipeline, the
-  `render-*` / `mount-*` split, layout and import rules, theming, adding a route.
-- [decisions.md](docs/decisions.md) — why there is no framework, why the fonts
-  are self-hosted, what was deliberately left unbuilt, and the toolchain.
+- [architecture.md](docs/architecture.md): the pages, the prerender step, the
+  `render-*` / `mount-*` split, state across page loads, layout and import rules,
+  and adding a page.
+- [decisions.md](docs/decisions.md): why there is no framework, why each route is
+  a real page, why the fonts are self-hosted, what was left unbuilt, and the
+  toolchain.

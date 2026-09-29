@@ -1,184 +1,188 @@
 # Architecture
 
-How the site is put together. For _why_ a given choice was made, see
+How the site is built. For why a choice was made, see
 [decisions.md](decisions.md).
 
 ---
 
-## The prerender pipeline
+## Pages
 
-Page content is not drawn by script. It is baked into `index.html` before the
-browser ever sees it, and script only attaches behaviour on top.
+Each page is a real HTML file:
 
-`index.html` marks each insertion point with a `<!--prerender:name-->` comment.
-[`build/prerender-content-plugin.ts`](../build/prerender-content-plugin.ts) swaps
-each one for the markup its renderer returns, using the slot → renderer map in
-`vite.config.ts`. A mismatch in either direction — a slot with no renderer, or a
-renderer with no slot — throws rather than shipping a hole.
+```
+index.html            Home, at /
+work/index.html       Work, at /work/
+personal/index.html   Personal, at /personal/
+404.html              served by GitHub Pages for any unknown path
+```
 
-This runs **at build time and on every dev-server request**. The plugin declares
-`transformIndexHtml` with no `apply` field, so there is no separate dev path that
-can drift from the built one.
+Each file names its page with `<html data-page="…">` and has two slots,
+`<!--prerender:head-->` and `<!--prerender:body-->`. Nothing else is in the files.
 
-What the plugin does **not** check is that a slot has a section to live in: its
-pattern reads the comment token and never looks at `id` or `data-page`. A route
-with a slot but no `<section data-page>` would satisfy the plugin, `tsc`, every
-test and `vite build`, and then ship blank — `main.ts` finds no active page and
-returns. [`src/prerendered-output.test.ts`](../src/prerendered-output.test.ts)
-asserts the correspondence instead.
+[`src/site-pages.ts`](../src/site-pages.ts) is the list of pages. Each entry has a
+route, a path, a label, a title and a description. These come from that list:
 
-The payoff: the site is readable with JavaScript disabled, crawlers get prose
-rather than an empty div, and `prefers-reduced-motion` becomes "skip the
-enhancement" rather than a second render path for every animation.
+- the navigation, the footers and the Home menu;
+- the console's page commands and its `help`;
+- each page's `<title>`, description, canonical URL and share tags;
+- the build inputs in `vite.config.ts`.
+
+---
+
+## The prerender step
+
+Script does not draw the page content. The build puts it into the HTML first.
+
+[`build/prerender-content-plugin.ts`](../build/prerender-content-plugin.ts) reads
+`data-page` from each HTML file. Then it fills each slot from the renderers in
+[`src/render-page-document.ts`](../src/render-page-document.ts). A slot with no
+renderer, or a renderer with no slot, stops the build.
+
+The plugin runs at build time and on each dev-server request, so dev and build
+use the same path.
+
+The result:
+
+- The site is readable with JavaScript off.
+- Crawlers and link previews get real text.
+- Reduced motion only means "skip the animation". There is no second render path.
 
 ---
 
 ## Four conventions
 
-There is no UI framework. Its job is done by these instead.
+There is no UI framework. These four rules do its job.
 
 ### 1. `render-*` is pure, `mount-*` touches the DOM
 
 ```
-render-work-git-graph.ts   string in, string out. No DOM. Runs in Node.
-mount-work-git-graph.ts    attaches behaviour to markup that already exists.
+render-work-page.ts   data in, markup out. No DOM. Runs in Node.
+mount-work-page.ts    adds behaviour to markup that already exists.
 ```
 
-The split is enforced by execution, not by convention alone: `vitest run` and
-`vite build` both run every `render-*` in Node, so a DOM call on the prerender
-path fails CI with a stack trace.
+`vitest run` and `vite build` both run every `render-*` in Node. So a DOM call on
+the render path fails CI.
 
-Three modules on that path carry no `render-` prefix — `commit-formatting.ts`,
-`graph-geometry.ts`, `typescript-highlighter.ts` — and `graph-geometry.ts` is
-imported by both halves, so no naming scheme can assign it a side. Each says in
-its header which side it runs on.
+`commit-formatting.ts`, `graph-geometry.ts` and `typescript-highlighter.ts` have
+no prefix. The render side and the mount side both use them, so they must stay
+free of the DOM too.
 
-### 2. `mount-*` returns a cleanup function
+### 2. A `CleanupScope` owns every timer and listener
 
-Everything a component creates — timers, intervals, listeners, observers — is
-owned by a [`CleanupScope`](../src/lib/cleanup-scope.ts). Disposing it
-releases all of them _and_ swallows callbacks that fire afterwards, which stops a
-half-finished typing sequence writing into DOM that has been replaced.
+A [`CleanupScope`](../src/lib/cleanup-scope.ts) holds the timers, intervals,
+listeners and observers that a piece of behaviour creates. `dispose()` releases
+all of them. It also stops callbacks that fire after that.
 
-`scope.delay()` is the load-bearing part: a disposed scope never resolves it, so
-an `async` sequence abandons itself mid-flight just by awaiting. That replaces an
-`if (dead) return` check after every step.
+`scope.delay()` never resolves on a disposed scope. So an `async` sequence stops
+at its next `await`, with no check after each step. For example, a click during
+the Work graph's draw disposes the draw's scope, and the draw stops.
 
-### 3. Classes style, `data-*` attributes are JS hooks
+### 3. Classes are for CSS, `data-*` attributes are for script
 
-If it has a class, CSS owns it. If it has a `data-` attribute, script looks it up
-by it. You can tell what is safe to rename by looking at it.
+Script finds elements only through `data-*` attributes. So you can rename a class
+for styling and no behaviour breaks.
+[`src/script-hooks.test.ts`](../src/script-hooks.test.ts) fails if a script finds
+or tests an element by class.
 
 ### 4. `src/styles/index.css` is the cascade, in order
 
-Every stylesheet that ships is listed there, in the order it cascades. Component
-CSS lives beside its component and is `@import`ed from that one file, so "what
-wins?" is answered by reading down a single list.
+Every stylesheet is `@import`ed from this one file, in cascade order. To find out
+which rule wins, read down one list. A test fails if a stylesheet on disk is
+missing from the list, or if the list names a file that does not exist.
 
 ---
 
-## Themes
+## State across page loads
 
-Five palettes ship. Bone is the default and the one the design was tuned on; the
-other four are one attribute on the root element, no JavaScript:
+Each page change is a new page load. Two things must survive it, so they are kept
+in `sessionStorage` through [`lib/session-store.ts`](../src/lib/session-store.ts):
 
-```html
-<html data-theme="sage">
-  <!-- or slate, amber, lilac -->
-</html>
-```
+- **Work.** The graph draws once in each session. A return visit shows it
+  finished, and the commit that was open is open again.
+- **The console.** The page keeps the command history, not the HTML. A new page
+  runs the history again, with a context that has no side effects. So the
+  transcript comes back, but no command navigates or opens a tab a second time.
 
-A theme moves the accent and the near-black surfaces only — the neutral greys are
-shared, which is what keeps the five looking like one design rather than five.
-Bone pins its status colour to green; the others let it follow the accent.
+If storage is full or blocked, nothing is kept and the pages still work.
 
 ---
 
 ## Layout
 
 ```
-build/          the prerender Vite plugin. Node-only tooling; never ships.
+index.html, work/, personal/, 404.html   one HTML file per page
+build/          the prerender Vite plugin. Runs in Node, never ships.
 src/
-  lib/          html templating, DOM helpers, CleanupScope, and motion/.
-                Knows nothing about this site; imports nothing outside itself
-  routing/      hash router, route names, page lifecycle
-  content/      page prose and data
-  chrome/       what every page shares: navigation, footer, console, scroll ring
-  pages/        one directory per route: home/, work/, personal/
-  styles/       tokens, themes, reset, keyframes + the cascade manifest
-  main.ts       the only place things are wired together
+  site-pages.ts           the list of pages
+  render-page-document.ts the <head> and <body> that every page shares
+  main.ts                 mounts the chrome, then the current page
+  lib/          html templating, DOM helpers, CleanupScope, session store,
+                and motion/. Knows nothing about this site.
+  content/      page text and data
+  chrome/       on every page: navigation, footer, console, scroll ring
+  pages/        one folder per page: home/, work/, personal/, not-found/
+  styles/       tokens, reset, keyframes, layout, and the cascade list
+tests/e2e/      Playwright tests, run against the production build
 ```
 
-**Imports run one way:** `lib` → `routing` → `content` → `chrome` → `pages` →
-`main.ts`. `.oxlintrc.json` enforces it with one `no-restricted-imports`
-override per directory. A page may not import another page, and only `main.ts`
-imports `mount-*` modules. `import/no-cycle` rejects anything that imports
-`main.ts`.
+**Imports go one way:** `lib` → `site-pages` → `content` → `chrome` → `pages` →
+the three files at the top of `src/`. `.oxlintrc.json` enforces this:
 
-**The build reaches into `src/` in two places.** `build/prerender-content-plugin.ts`
-imports only `lib/html-template`, the one Node-safe module in `lib/`.
-`vite.config.ts` imports the `render-*` entry points named in the slot map.
+- `lib/` imports nothing else from `src/`.
+- `content/` imports no code.
+- `chrome/` imports no page, and a page imports no other page.
+- Only `main.ts` imports `mount-*` modules.
+- `build/` imports only Node-safe code.
 
-**`styles/index.css` `@import`s upward into `chrome/*/*.css` and `pages/*/*.css`.** That is the one
-upward arrow in the repo, it is CSS rather than TypeScript, and it is deliberate:
-exactly one file may own an order. A stylesheet missing from it ships silently
-unstyled, so `prerendered-output.test.ts` checks both directions.
+`import/no-cycle` rejects any cycle, including one made of type imports.
 
-**Components never reach for each other's behaviour.** `mount-*` are wired only
-in `main.ts`. Their `render-*` halves do compose freely: `render-site-footer` is
-called straight from Work and Personal, which is what pure functions are for, and
-is how the footer reaches two pages without `main.ts` assembling markup at
-runtime.
+`render-*` modules compose freely. For example, Work and Personal both call
+`renderSiteFooter`.
 
 ---
 
-## Adding a route
+## Adding a page
 
-Add it to [`src/routing/route-names.ts`](../src/routing/route-names.ts), then run
-the tests. They will tell you the rest — the slot, the section, the navigation
-link and the home menu are all asserted against the route list, so anything you
-forget fails rather than shipping quietly.
+1. Add an entry to `sitePages` in `src/site-pages.ts`.
+2. Copy `work/index.html` to the new path, and change `data-page`.
+3. Add a renderer to `pageRenderers` in `src/render-page-document.ts`.
+4. Add a line to `homeMenuDescriptions` in `src/content/home-page-content.ts`.
+5. If the page has behaviour, add it to `pageMounters` in `src/main.ts`.
+6. Run `pnpm check`.
 
-Which sections are routes is stated in `index.html` (`<section data-page>`) and
-listed in `route-names.ts`. It is deliberately not restated in prose anywhere: a
-duplicated list drifts, a pointer to an enforced fact does not.
-
-`pageMounters` in `main.ts` stays partial on purpose — a route with no behaviour
-is legitimate. Personal has none.
+**Note:** You cannot skip steps 2, 3 or 4. The compiler rejects a missing
+renderer or menu line. A test fails if a page has no HTML file, or a file has no
+page.
 
 ---
 
 ## Behaviour that looks like detail but is not
 
-**The git graph draws at one constant speed** (0.46 px/ms), and the corner is
-timed by its own arc length so the bend travels at the same rate as a vertical.
-Rows chain on the real `transitionend` of the stroke above them, never on a
-running total of durations — a total either races the trunk or needs padding that
-reads as a pause. `graph-geometry.test.ts` pins the speed, because a graph drawn
-at inconsistent speeds looks fine in a screenshot and wrong in motion.
+**The git graph draws at one constant speed** (0.46 px/ms). The corner is timed by
+its own arc length, so the bend moves at the same speed as a straight line. Each
+row starts on the real `transitionend` of the stroke above it, not on a sum of
+durations. A sum either runs ahead of the stroke or needs padding that shows as a
+pause.
 
-**Command output renders all at once**, never staggered line by line. A real
-shell returns its output in one beat; staggering reads as decoration.
+**Command output appears all at once**, not line by line. A real shell returns its
+output in one step.
 
-**Opening a commit holds the clicked row still.** Switching collapses the outgoing
-body instantly — the scroll anchor would otherwise chase a target moving a
-thousand pixels. Closing shrinks it over time instead, because folding that much
-height in one pass makes the browser snap the scroll position back, and once it
-does the old position cannot be recovered. See
+**Opening a commit holds the clicked row still.** When you switch commits, the old
+body closes at once. When you close a commit, it shrinks over time. If a lot of
+height goes in one step, the browser clamps the scroll position, and the old
+position cannot come back. See
 [`commit-row-expansion.ts`](../src/pages/work/commit-row-expansion.ts).
 
-**Home replays on every visit; Work and Personal do not.** Arriving at Home
-should feel like arriving. Watching the graph redraw every time you come back
-from Personal would not. See
-[`page-lifecycle.ts`](../src/routing/page-lifecycle.ts).
+**Home plays its intro on each visit.** Work draws its graph once in each session.
 
 ---
 
-## Deployment shape
+## Deployment
 
-This is a GitHub Pages **user site**, served from the domain root, so `base` is
-`'/'` in `vite.config.ts`.
+This is a GitHub Pages **user site** at the domain root, so Vite's default
+`base` of `/` is correct.
 
-Routing is hash-based (`#home`, `#work`, `#personal`). Pages serves static files
-with no rewrite rules, so hash routing is what makes deep links work without a
-`404.html` redirect trick — the server only ever has to find `index.html`.
+- GitHub Pages serves `/work/` from `work/index.html`.
+- It serves `404.html` for any path that does not exist.
+- Old links such as `/#work` load Home, and an inline script in Home's `<head>`
+  sends them to `/work/`.
