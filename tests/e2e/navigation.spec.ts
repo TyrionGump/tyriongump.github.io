@@ -93,3 +93,30 @@ test("the skip link moves focus past the navigation", async ({ page }) => {
   await page.keyboard.press("Enter");
   await expect(page.locator("main")).toBeFocused();
 });
+
+test.describe("with motion", () => {
+  test.use({ reducedMotion: "no-preference" });
+
+  for (const path of ["/", "/404.html"]) {
+    test(`${path} never scrolls while its entrance plays`, async ({ page }) => {
+      // Records the largest overflow in every frame, from before the first paint.
+      await page.addInitScript(() => {
+        const record = () => {
+          const root = document.documentElement;
+          const overflow = root.scrollHeight - root.clientHeight;
+          const win = window as unknown as { maxOverflow?: number };
+          win.maxOverflow = Math.max(win.maxOverflow ?? 0, overflow);
+          requestAnimationFrame(record);
+        };
+        requestAnimationFrame(record);
+      });
+      await page.goto(path);
+      await page.waitForTimeout(1500);
+
+      const maxOverflow = await page.evaluate(
+        () => (window as unknown as { maxOverflow?: number }).maxOverflow,
+      );
+      expect(maxOverflow).toBe(0);
+    });
+  }
+});

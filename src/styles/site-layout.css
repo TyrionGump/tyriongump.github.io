@@ -4,7 +4,9 @@
   color: var(--text-primary-soft);
   font-family: var(--font-sans);
   position: relative;
-  overflow-x: clip;
+  /* Entrance animations translate content past the edge. Clipping stops that
+     from adding a scrollbar that then goes away and shifts the page. */
+  overflow: clip;
 }
 
 .site-page {
