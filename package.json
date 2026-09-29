@@ -15,9 +15,11 @@
     "format:check": "oxfmt --check",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check": "pnpm run typecheck && pnpm run lint && pnpm run format:check && pnpm run test && pnpm run build"
+    "test:e2e": "playwright test",
+    "check": "pnpm run typecheck && pnpm run lint && pnpm run format:check && pnpm run test && pnpm run build && pnpm run test:e2e"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "oxfmt": "^0.62.0",
     "oxlint": "^1.77.0",
     "typescript": "^7.0.2",

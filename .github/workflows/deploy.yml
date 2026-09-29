@@ -54,6 +54,12 @@ jobs:
       - name: Build
         run: pnpm run build
 
+      - name: Install the browser for browser tests
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Browser tests
+        run: pnpm run test:e2e
+
       - if: github.ref == 'refs/heads/main'
         uses: actions/configure-pages@v6
 
