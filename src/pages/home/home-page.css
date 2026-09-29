@@ -1,8 +1,3 @@
-/**
- * Home: a centred hero, not a column. It uses the wide nav frame rather than the
- * 900px interior frame because it has no footer hairline to align to.
- */
-
 .home-page-frame {
   display: flex;
   flex-direction: column;
@@ -56,11 +51,8 @@
 
 /* ---- The session ------------------------------------------------------ */
 
-/**
- * A grid with a single cell. The baked transcript and the animated copy both sit
- * in it, stacked — which is how the hidden copy goes on sizing the panel while
- * the visible one is still filling up.
- */
+/* Both transcripts share one grid cell, so the hidden full copy sizes the
+   panel while the visible one types. */
 .home-terminal-body {
   display: grid;
   padding: 26px 26px 30px;
@@ -100,8 +92,7 @@
   height: 22px;
 }
 
-/* An h1 — see render-home-terminal-panel.ts. Sized as a terminal line, not as a
-   heading, so the markup carries the meaning and the design stays intact. */
+/* An h1 for the document outline, styled as a terminal line. */
 .home-terminal-line-greeting {
   margin: 0;
   font-family: inherit;
@@ -120,10 +111,7 @@
   color: var(--palette-status);
 }
 
-/**
- * Entrances apply only inside the animated copy. The baked replica is hidden and
- * must not animate — it is furniture, not choreography.
- */
+/* Scoped to the animated copy so the hidden sizing replica never animates. */
 .home-terminal-transcript-stage .home-terminal-output {
   animation: fade-in 0.16s ease both;
 }
@@ -151,7 +139,6 @@
   padding-bottom: 7px;
 }
 
-/* Hangs the question off the command above it, the way a tree-drawing CLI does. */
 .home-terminal-menu-connector {
   color: #5a625c;
   padding-right: 9px;
@@ -170,7 +157,6 @@
 .home-terminal-menu-options {
   list-style: none;
   margin: 0;
-  /* The choices indent under the question that asked them. */
   padding: 0 0 0 16px;
 }
 
@@ -229,8 +215,7 @@
   color: #a7afa8;
 }
 
-/* Anchors inherit the global white hover; inside the menu the highlight is
-   already what shows you where you are, so the colour swap would fight it. */
+/* Cancels the global white link hover; the selection highlight already marks the option. */
 .home-terminal-menu-option:hover {
   color: inherit;
 }

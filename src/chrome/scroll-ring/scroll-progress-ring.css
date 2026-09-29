@@ -14,7 +14,7 @@
   transition:
     opacity 0.36s ease,
     transform 0.36s var(--easing-movement);
-  /* Hidden means unclickable, not just invisible. */
+  /* `opacity: 0` alone would leave it clickable. */
   pointer-events: none;
 }
 
@@ -42,7 +42,7 @@
   stroke: var(--palette-accent);
   stroke-width: 1.5;
   stroke-linecap: round;
-  /* Short and linear: it should track the scrollbar, not lag behind it. */
+  /* Short and linear so the arc keeps pace with the scrollbar. */
   transition: stroke-dashoffset 0.12s linear;
 }
 

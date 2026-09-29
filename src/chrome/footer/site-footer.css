@@ -1,8 +1,3 @@
-/**
- * The hairline footer. Its top rule measures the shared 900px interior frame —
- * that alignment is the reason the frame is one variable.
- */
-
 .site-footer {
   display: flex;
   align-items: center;
@@ -18,8 +13,7 @@
   transition: color 0.25s ease;
 }
 
-/* Overrides the global white anchor hover: this link is already accent-coloured,
-   so it brightens toward the text scale instead. */
+/* Overrides the global white link hover, since this link is already accent-coloured. */
 .site-footer-link:hover {
   color: var(--text-primary-typed);
 }

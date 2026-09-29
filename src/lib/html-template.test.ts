@@ -1,13 +1,3 @@
-/**
- * These are the most important tests in the project.
- *
- * `html` is the single boundary where data becomes markup. Every page on this
- * site is built through it, at build time, and a hole here would be baked into
- * the served HTML rather than caught at runtime. The content happens to be
- * hand-written today — but "the input is trusted" is exactly the assumption that
- * stops being true the first time this reads from a CMS or a URL.
- */
-
 import { describe, expect, it } from "vitest";
 
 import { escapeHtml, html, renderFragmentToMarkup, unsafeTrustedHtml } from "./html-template";
@@ -46,10 +36,8 @@ describe("html", () => {
     expect(render(html`<p>${inner}</p>`)).toBe("<p><em>a &amp; b</em></p>");
   });
 
-  // These two interpolate at the top level rather than inside a block element
-  // like <ul>. The assertion is about how `html` joins values, and wrapping it
-  // in markup would make the expected string depend on how the formatter chooses
-  // to lay that markup out.
+  // These interpolate at the top level: inside a <ul>, the expected string would
+  // depend on how the formatter lays out the markup.
   it("joins arrays with no separator, so list items do not get commas", () => {
     const items = ["one", "two"].map((text) => html`<li>${text}</li>`);
     expect(render(html`${items}`)).toBe("<li>one</li><li>two</li>");
@@ -64,7 +52,6 @@ describe("html", () => {
   });
 
   it("renders zero, which is falsy but is still a value someone meant to show", () => {
-    // The Harbor project genuinely has a metric of 0 ("rollouts ever lost").
     expect(render(html`<span>${0}</span>`)).toBe("<span>0</span>");
   });
 

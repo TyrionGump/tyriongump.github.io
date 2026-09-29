@@ -1,17 +1,10 @@
-/**
- * The Personal page's copy — the human half of the site.
- *
- * The bio is split into segments rather than kept as one string because one
- * word in it ("terminal") is a control that opens the console. Keeping that as
- * structure means the content file never has to contain markup, and the
- * renderer never has to search prose for a magic word.
- */
+// The bio is split into segments so one word ("terminal") can open the console
+// without putting markup in the copy.
 
 import { siteIdentity } from "./site-identity";
 
 export interface ProseSegment {
   readonly text: string;
-  /** Renders as the dotted-underline trigger that summons the console. */
   readonly opensConsole?: true;
 }
 
@@ -38,7 +31,6 @@ export const personalBioParagraphs: readonly (readonly ProseSegment[])[] = [
 export interface NowEntry {
   readonly label: string;
   readonly value: string;
-  /** Rendered in the status green, like the prompt glyph. */
   readonly isStatus?: true;
 }
 

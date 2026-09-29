@@ -1,10 +1,3 @@
-/**
- * The highlighter is small and hand-rolled, which is the right call for a few
- * dozen lines of display code — but hand-rolled tokenisers have two classic
- * failure modes worth pinning down: a rule that matches nothing and loops
- * forever, and escaping that gets skipped because the input "is just code".
- */
-
 import { describe, expect, it } from "vitest";
 
 import { renderFragmentToMarkup } from "../../lib/html-template";
@@ -47,7 +40,6 @@ describe("highlightTypeScriptLine", () => {
   });
 
   it("terminates on input no rule matches", () => {
-    // The fallback consumes one character per pass; without it this hangs.
     expect(() => highlight("€¥§")).not.toThrow();
     expect(highlight("€¥§")).toContain("€");
   });

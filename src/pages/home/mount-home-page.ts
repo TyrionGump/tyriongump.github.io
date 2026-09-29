@@ -1,17 +1,3 @@
-/**
- * Brings the Home terminal panel to life.
- *
- * The finished session is already in the document (baked in at build time). This
- * module does three things on top of it: runs the panel clock, dims the panel
- * when the window loses focus, and — when motion is welcome — replays the
- * session as if it were being typed.
- *
- * The replay does not replace the baked markup. It hides it and layers an
- * animated copy over it in the same grid cell, so the hidden copy goes on
- * sizing the panel while the visible one fills up. Nothing shifts, and there is
- * no hard-coded height to go stale at an awkward width.
- */
-
 import { CleanupScope } from "../../lib/cleanup-scope";
 import { prefersReducedMotion } from "../../lib/motion/motion-preference";
 import { siteIdentity } from "../../content/site-identity";
@@ -19,7 +5,6 @@ import { findElement, requireElement } from "../../lib/dom-queries";
 import { playHomeIntroSequence } from "./home-intro-sequence";
 import { activateHomeNavigationMenu } from "./home-navigation-menu";
 
-/** Ticking faster than this would be visible work for no visible change. */
 const CLOCK_TICK_INTERVAL_MS = 15_000;
 
 function startPanelClock(panel: HTMLElement, scope: CleanupScope): void {
@@ -41,11 +26,6 @@ function startPanelClock(panel: HTMLElement, scope: CleanupScope): void {
   scope.setInterval(showCurrentTime, CLOCK_TICK_INTERVAL_MS);
 }
 
-/**
- * Real terminals dim their frame when the window loses focus. Reproducing that
- * is behaviour rather than ornament — it costs no space and adds nothing new to
- * the screen.
- */
 function startPanelFocusDimming(panel: HTMLElement, scope: CleanupScope): void {
   const setWindowFocused = (isFocused: boolean): void => {
     panel.classList.toggle("is-window-unfocused", !isFocused);
@@ -57,9 +37,8 @@ function startPanelFocusDimming(panel: HTMLElement, scope: CleanupScope): void {
     setWindowFocused(document.visibilityState !== "hidden"),
   );
 
-  // Seeded bright deliberately: `document.hasFocus()` reports false in plenty of
-  // situations where the visitor is looking straight at the page, and starting
-  // dim would make the dimmed state the one most people see first.
+  // Start bright: `document.hasFocus()` often reports false while the visitor is
+  // looking at the page.
   setWindowFocused(true);
 }
 
@@ -73,13 +52,12 @@ export function mountHomePage(main: HTMLElement): void {
   const bakedTranscript = requireElement(panel, "[data-home-terminal-transcript]");
 
   if (prefersReducedMotion()) {
-    // Nothing to replay — the session is already on screen in its final state.
     activateHomeNavigationMenu(requireElement(bakedTranscript, "[data-home-terminal-menu]"), scope);
     return;
   }
 
-  // Kept in the layout so it goes on sizing the panel, but taken out of the
-  // accessibility tree and the tab order while the animated copy is on top.
+  // The baked copy stays in the layout to size the panel under the animated copy.
+  // Hide it from assistive tech and the tab order.
   bakedTranscript.classList.add("is-sizing-replica");
   bakedTranscript.setAttribute("aria-hidden", "true");
   bakedTranscript.setAttribute("inert", "");

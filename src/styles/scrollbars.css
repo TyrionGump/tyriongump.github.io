@@ -1,10 +1,5 @@
-/**
- * Site-wide scrollbar styling.
- *
- * The thumb is drawn with a transparent border and `background-clip: padding-box`
- * so it reads as a thin bar inside a wider hit area — easier to grab than an
- * 11px-wide target while still looking like a hairline.
- */
+/* The thumb's transparent border and padding-box clip draw a thin bar
+   inside a wider, easier-to-grab hit area. */
 
 html {
   scrollbar-width: thin;

@@ -1,22 +1,4 @@
-/**
- * The Home page: a shell window that types `whoami` and answers itself.
- *
- * These functions render the session's **finished** state. That matters twice
- * over:
- *
- *  1. It is what ships in the served HTML — so the page says who this is even
- *     with JavaScript off, and search engines read prose rather than an empty
- *     div. It is also what a visitor with `prefers-reduced-motion` sees.
- *  2. It stays in the layout as a hidden replica while the animated copy plays
- *     on top of it, which sizes the panel correctly from the first frame. No
- *     hard-coded panel height to go stale at odd widths, and nothing shifts as
- *     content types in.
- *
- * The intro sequence reuses the same small renderers below to build its
- * animated copy, so the two can never disagree about what the session says.
- *
- * Runs in Node at build time, so nothing here — or anything it imports — may touch the DOM.
- */
+// Runs in Node at build time, so nothing here or in its imports may touch the DOM.
 
 import {
   homeIntroCommand,
@@ -33,7 +15,6 @@ type MenuRoute = keyof typeof homeMenuDescriptions;
 
 const menuRoutes = routeNames.filter((route): route is MenuRoute => route in homeMenuDescriptions);
 
-/** A prompt line with its command already typed out. */
 export function renderHomeCommandLine(
   command: string,
   options?: { readonly isFollowUp?: boolean },
@@ -51,25 +32,17 @@ function renderOutputLine(line: TerminalOutputLine): HtmlFragment {
   if (line.kind === "blank-line") {
     return html`<div class="home-terminal-blank-line" aria-hidden="true"></div>`;
   }
-  // The greeting is this page's heading — Home has no other one, and a document
-  // whose landing page has no h1 is a document with no title as far as assistive
-  // tech is concerned. It stays styled as a terminal line.
+  // The greeting is Home's only h1, so assistive tech gets a page title.
   if (line.role === "greeting") {
     return html`<h1 class="home-terminal-line home-terminal-line-greeting">${line.text}</h1>`;
   }
   return html`<div class="home-terminal-line home-terminal-line-${line.role}">${line.text}</div>`;
 }
 
-/** `whoami`'s answer, as one block — a shell returns its output in one beat. */
 export function renderHomeIntroOutput(): HtmlFragment {
   return html` <div class="home-terminal-output">${homeIntroOutput.map(renderOutputLine)}</div> `;
 }
 
-/**
- * The two-door menu. A menu waits for you in a way a greyed-out hint never
- * does, and `open` with no argument is a real shell pattern rather than an
- * invented one.
- */
 export function renderHomeNavigationMenu(): HtmlFragment {
   return html`
     <div class="home-terminal-menu" data-home-terminal-menu>
@@ -102,7 +75,6 @@ export function renderHomeNavigationMenu(): HtmlFragment {
   `;
 }
 
-/** The finished session: both commands, the output, and the menu. */
 export function renderHomeTranscript(): HtmlFragment {
   return html`
     <div class="home-terminal-transcript" data-home-terminal-transcript>

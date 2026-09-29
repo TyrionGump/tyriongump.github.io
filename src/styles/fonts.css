@@ -1,10 +1,5 @@
-/**
- * Self-hosted variable woff2, latin subset. One file per family covers the whole
- * 400–700 axis. See docs/decisions.md for why these are not fetched from a CDN.
- *
- * The unicode-range mirrors Google's latin subset. Glyphs outside it — ❯, ✓, ▊,
- * → — fall through to a system font, as they always did.
- */
+/* The unicode-range matches Google's latin subset.
+   Glyphs outside it, such as ❯ ✓ ▊ →, fall back to a system font. */
 
 @font-face {
   font-family: "Manrope";

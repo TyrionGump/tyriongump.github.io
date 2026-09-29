@@ -1,9 +1,3 @@
-/**
- * The markup every HTML file shares. Each file names its page with
- * `<html data-page="…">`, and the prerender plugin fills its `head` and `body`
- * slots from these two functions.
- */
-
 import { renderConsoleOverlay } from "./chrome/console/render-console-overlay";
 import { renderSiteNavigation } from "./chrome/navigation/render-site-navigation";
 import { renderScrollProgressRing } from "./chrome/scroll-ring/render-scroll-progress-ring";

@@ -1,18 +1,8 @@
-/**
- * A small fixed ring in the bottom-right corner that fills as you scroll and
- * returns you to the top when clicked.
- *
- * The arc's circumference is baked into the markup as its dash array: with
- * `r=16` that is 2πr ≈ 100.53. It is exported rather than duplicated, because
- * `mount-scroll-progress-ring.ts` drives `stroke-dashoffset` from the same
- * number every frame and the two must agree exactly.
- *
- * Runs in Node at build time, so nothing here — or anything it imports — may touch the DOM.
- */
+// Runs in Node at build time, so nothing here or in its imports may touch the DOM.
 
 import { html, type HtmlFragment } from "../../lib/html-template";
 
-/** 2π × 16, the radius used below. */
+/** 2π × 16. Change it with the circles' `r` below. */
 export const scrollRingCircumference = 100.53;
 
 export function renderScrollProgressRing(): HtmlFragment {

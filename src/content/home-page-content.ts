@@ -1,29 +1,15 @@
-/**
- * The Home page's shell session, as data.
- *
- * A line declares only what it *is* (`greeting`, `body`, `status`); the
- * stylesheet decides how that looks. Resizing the text is one CSS edit rather
- * than a hunt through content.
- */
-
 import type { RouteName } from "../site-pages";
 import { siteIdentity } from "./site-identity";
 
-/** Which type role a terminal output line plays. Maps 1:1 to a CSS class. */
+/** Each role is also a CSS class name. */
 export type TerminalLineRole = "greeting" | "body" | "status";
 
 export type TerminalOutputLine =
   | { readonly kind: "blank-line" }
   | { readonly kind: "text"; readonly role: TerminalLineRole; readonly text: string };
 
-/** The command the visitor watches being typed first. */
 export const homeIntroCommand = "whoami";
 
-/**
- * `whoami`'s answer. Rendered all at once on a single fade, never staggered
- * line by line — a real shell returns its output in one beat, and staggering
- * reads as decoration rather than as a terminal.
- */
 export const homeIntroOutput: readonly TerminalOutputLine[] = [
   { kind: "blank-line" },
   { kind: "text", role: "greeting", text: `Hi, I'm ${siteIdentity.displayName}.` },
@@ -37,16 +23,10 @@ export const homeIntroOutput: readonly TerminalOutputLine[] = [
   },
 ];
 
-/**
- * The second command. `open` with no argument, so the shell has to ask which —
- * a real shell pattern, and a menu waits for you in a way a greyed-out hint
- * never does.
- */
 export const homeMenuCommand = "open";
 
 export const homeMenuPrompt = "where to next";
 
-/** One line per page the menu offers. A page missing here is a type error. */
 export const homeMenuDescriptions: Readonly<Record<Exclude<RouteName, "home">, string>> = {
   work: "two systems, both still running",
   personal: "notes, experiments, a live shell",

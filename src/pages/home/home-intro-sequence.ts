@@ -1,16 +1,3 @@
-/**
- * The Home page's typed choreography.
- *
- * Every delay below is deliberate and comes from the design. The two commands
- * type at different speeds on purpose: `whoami` is the line you are meant to
- * read, `open` is scene-setting for the menu underneath it.
- *
- * It is a flat `async` function because that is what it is — a script with
- * pauses. Every `await` goes through the `CleanupScope`, so navigating away
- * mid-sequence leaves the pending delay unresolved and the rest of the function
- * simply abandoned. No "is this still the current run?" check after every step.
- */
-
 import type { CleanupScope } from "../../lib/cleanup-scope";
 import { typeTextIntoElement, type TypingSpeed } from "../../lib/motion/type-into-element";
 import { homeIntroCommand, homeMenuCommand } from "../../content/home-page-content";
@@ -22,18 +9,13 @@ import {
   renderHomeNavigationMenu,
 } from "./render-home-page";
 
-/** A human at a keyboard, not a ticker: every character lands at a slightly different pace. */
 const INTRO_COMMAND_TYPING_SPEED: TypingSpeed = { minimumDelayMs: 36, maximumDelayMs: 70 };
 const MENU_COMMAND_TYPING_SPEED: TypingSpeed = { minimumDelayMs: 52, maximumDelayMs: 92 };
 
-/** A beat before the first character, so the panel is settled before anything moves. */
 const DELAY_BEFORE_FIRST_CHARACTER_MS = 420;
-/** The pause between pressing Enter and the shell answering. */
 const DELAY_BEFORE_OUTPUT_RETURNS_MS = 180;
-/** Long enough to read the answer before the next prompt appears. */
 const DELAY_BEFORE_FOLLOW_UP_PROMPT_MS = 620;
 const DELAY_BEFORE_FOLLOW_UP_COMMAND_MS = 220;
-/** The shell "thinking" before it asks which door you want. */
 const DELAY_BEFORE_MENU_APPEARS_MS = 260;
 
 function appendCaret(commandLine: HTMLElement): HTMLElement {
@@ -45,10 +27,8 @@ function appendCaret(commandLine: HTMLElement): HTMLElement {
 }
 
 /**
- * Plays the session into `stage` and resolves with the live menu element.
- *
- * Never resolves if the scope is disposed part-way, by design — see the module
- * comment.
+ * Resolves with the live menu. Every wait goes through `scope`, so disposing it
+ * leaves the promise pending and the rest of the sequence never runs.
  */
 export async function playHomeIntroSequence(
   stage: HTMLElement,
@@ -63,12 +43,9 @@ export async function playHomeIntroSequence(
     { scope, speed: INTRO_COMMAND_TYPING_SPEED, startDelayMs: DELAY_BEFORE_FIRST_CHARACTER_MS },
   );
 
-  // The command has been submitted; the caret is no longer on this line.
   introCaret.remove();
   await scope.delay(DELAY_BEFORE_OUTPUT_RETURNS_MS);
 
-  // Output lands all at once on a single fade. A real terminal returns its
-  // output in one beat, and staggering it line by line reads as decoration.
   appendFragment(stage, renderHomeIntroOutput());
   await scope.delay(DELAY_BEFORE_FOLLOW_UP_PROMPT_MS);
 
@@ -78,8 +55,7 @@ export async function playHomeIntroSequence(
   );
   const menuCaret = appendCaret(menuCommandLine);
 
-  // Appended now but still transparent, so revealing it later cannot shift
-  // anything that is already on screen.
+  // Append the menu now, while transparent, so revealing it later shifts nothing.
   const menu = appendFragment(stage, renderHomeNavigationMenu());
 
   await typeTextIntoElement(
@@ -90,8 +66,6 @@ export async function playHomeIntroSequence(
 
   await scope.delay(DELAY_BEFORE_MENU_APPEARS_MS);
 
-  // The caret hands over to the menu: the shell is now waiting on a choice
-  // rather than on more typing.
   menuCaret.remove();
   forceStyleReflow(menu);
   menu.classList.add("is-revealed");

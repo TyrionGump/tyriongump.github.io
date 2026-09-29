@@ -1,34 +1,10 @@
-/**
- * Draws the git graph like a pen.
- *
- * Two properties make it read as drawing rather than as decoration, and both are
- * easy to lose in a refactor:
- *
- *  1. **One constant speed.** Every stroke moves at `penSpeedPxPerMs`, and the
- *     corner is timed by its own arc length rather than its duration being
- *     guessed — otherwise the bend crawls while the verticals race.
- *  2. **Rows chain on the real `transitionend` of the stroke above them**, never
- *     on a running total of durations — see `wait-for-transition-end.ts` for
- *     why a total cannot be made to work.
- *
- * Easing is `linear` throughout, for the same reason: a pen travels at one pace.
- *
- * The sequence runs on its own child scope. Disposing that scope abandons the
- * chain wherever it happens to be — which is exactly what a click during the
- * draw needs, since the row it lands on must snap to its finished state
- * immediately rather than queue behind the animation.
- */
-
 import { CleanupScope } from "../../lib/cleanup-scope";
 import { waitForTransitionEnd } from "../../lib/motion/wait-for-transition-end";
 import { findAllElements, findElement } from "../../lib/dom-queries";
 import { branchCurveStartY, graphGeometry as geometry, strokeDurationMs } from "./graph-geometry";
 
-/** A beat between the HEAD node landing and its trunk starting to run. */
 const DELAY_AFTER_HEAD_NODE_MS = 120;
-/** The branch node lands as the corner finishes; the text follows just behind it. */
 const DELAY_TEXT_AFTER_BRANCH_MS = 140;
-/** How long the trunk pauses at the peel point while the branch grows out of it. */
 const TRUNK_PAUSE_AT_PEEL_MS = 80;
 
 const CURVE_DURATION_MS = Math.round(geometry.curvePathLength / geometry.penSpeedPxPerMs);
@@ -39,7 +15,6 @@ function reveal(row: HTMLElement, selector: string): void {
   if (element) element.style.opacity = "1";
 }
 
-/** Re-cuts a row's dash to exactly its height, and marks it as drawn. */
 function finishRowTrunkPath(row: HTMLElement): void {
   const path = findElement<SVGPathElement>(row, "[data-graph-trunk-path]");
   if (!path) return;
@@ -48,15 +23,10 @@ function finishRowTrunkPath(row: HTMLElement): void {
 }
 
 export interface GraphDrawController {
-  /** Starts the draw. Does nothing after the first call, or after a snap. */
+  /** Does nothing after the first call or after a snap. */
   play(): void;
-  /** Puts every stroke, node and text block in its finished state immediately. */
   snapToFinalState(): void;
-  /**
-   * Re-cuts a row's trunk dash after its height changed. Opening a commit grows
-   * a row by hundreds of pixels, and the trunk is a fixed-length dash rather
-   * than a scaled box, so it does not follow on its own.
-   */
+  /** Call after a row's height changes: the trunk is a fixed-length dash and does not follow. */
   syncRowTrunk(row: HTMLElement): void;
 }
 
@@ -64,9 +34,6 @@ function setStrokeDuration(element: Element, durationMs: number): void {
   (element as HTMLElement).style.transitionDuration = `${Math.max(0, Math.round(durationMs))}ms`;
 }
 
-/** Runs a dashed stroke to `offset`. Called twice per commit row — down to the
- *  peel point, then on to the row's foot — so the pen can stop and start again
- *  on the same path without the line ever showing a seam. */
 function runDashTo(path: SVGPathElement, offset: number, durationMs: number): void {
   setStrokeDuration(path, durationMs);
   path.style.strokeDashoffset = String(offset);
@@ -99,10 +66,6 @@ export function createGraphDrawSequence(
     await waitForTransitionEnd(trunk, durationMs, drawScope);
   }
 
-  /**
-   * One stroke through the row: it runs down to the peel point, waits while the
-   * branch grows out of it and sets its node, then carries on to the row's foot.
-   */
   async function drawCommitRow(row: HTMLElement): Promise<void> {
     const trunkPath = findElement<SVGPathElement>(row, "[data-graph-trunk-path]");
     const curvePath = findElement<SVGPathElement>(row, "[data-graph-curve-path]");
@@ -143,10 +106,8 @@ export function createGraphDrawSequence(
   }
 
   /**
-   * Sequential on purpose — this is the pen. Each `await` is a row waiting for
-   * the real `transitionend` of the stroke above it; `Promise.all` would start
-   * the trunk, both branches and the root in the same frame, racing rather than
-   * handing off.
+   * Each row waits for the real `transitionend` of the stroke above it. Transitions
+   * land a frame or two late, so a sum of durations would start rows too early.
    */
   async function drawEveryRow(): Promise<void> {
     /* oxlint-disable no-await-in-loop -- sequential by design; see above */
@@ -170,8 +131,7 @@ export function createGraphDrawSequence(
       if (hasSnapped) return;
       hasSnapped = true;
       hasStarted = true;
-      // Abandons the chain wherever it is, so nothing lands on top of the
-      // finished state a frame later.
+      // Stop the chain first, so no pending step lands on the finished state.
       drawScope.dispose();
 
       for (const row of rows) {

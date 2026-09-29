@@ -1,19 +1,5 @@
-/**
- * Ownership of every timer, interval, listener and observer a mounted component
- * creates, so all of them can be released in one call.
- *
- * Several loops on this site run indefinitely (the panel clock, the caret, the
- * scroll ring), and animation sequences chain through many nested timeouts. A
- * scope gives them a single owner and — crucially — swallows callbacks that fire
- * after disposal, which is what stops a half-finished typing sequence from
- * writing into DOM that has already been torn down or replaced.
- *
- * The timer calls inside the methods below are the **globals**, despite two
- * methods here sharing their names — a bare call cannot reach an instance
- * method, which needs `this.`. They are unprefixed rather than `window.` so this
- * module, the most depended-upon in the repo, can be exercised in Node. Nothing
- * else here touches a browser global, so `cleanup-scope.test.ts` needs no DOM.
- */
+// The bare `setTimeout`/`setInterval` calls below are the globals, not these methods.
+// They skip `window.` so the tests run in Node without a DOM.
 
 export type CleanupFunction = () => void;
 
@@ -25,7 +11,7 @@ export class CleanupScope {
     return this.#disposed;
   }
 
-  /** Registers arbitrary teardown. Ignored (and run immediately) once disposed. */
+  /** Runs `cleanup` at once if the scope is already disposed. */
   onDispose(cleanup: CleanupFunction): void {
     if (this.#disposed) {
       cleanup();
@@ -64,11 +50,7 @@ export class CleanupScope {
     this.onDispose(() => target.removeEventListener(type, guarded, options));
   }
 
-  /**
-   * Resolves after `delayMs`. Never resolves if the scope is disposed first,
-   * which lets `async` sequences abandon themselves mid-flight simply by
-   * awaiting — no `dead` flag check after every step.
-   */
+  /** Never resolves if the scope is disposed first, so an awaiting sequence just stops. */
   delay(delayMs: number): Promise<void> {
     return new Promise<void>((resolve) => {
       this.setTimeout(resolve, delayMs);

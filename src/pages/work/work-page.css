@@ -1,14 +1,5 @@
-/**
- * Work — the project list as repository history.
- *
- * Two things to know before editing:
- *
- *  1. The rail geometry (74/12/44/38/…) is generated from `graph-geometry.ts`
- *     into inline styles. Do not add competing positions here.
- *  2. Rules under `.js-enabled` set the *pre-animation* state. Without
- *     JavaScript none of them apply, so the graph ships drawn and every commit
- *     ships open and readable. Script collapses them on mount.
- */
+/* Rail positions come from graph-geometry.ts as inline styles; do not set them here.
+   `.js-enabled` rules set the pre-animation state, so without JS everything renders finished. */
 
 .work-page-frame {
   display: flex;
@@ -36,8 +27,6 @@
 }
 
 .work-footer {
-  /* Pushes the footer to the bottom on a short viewport, and keeps a full
-     screen of air below the root commit on a tall one. */
   margin-top: auto;
   padding-top: 104px;
   flex: none;
@@ -68,8 +57,7 @@
   width: var(--terminal-prompt-gutter);
 }
 
-/* One group at one opacity: where the branch meets the trunk, two strokes
-   overlap, and separate opacities would make the join glow. */
+/* One opacity on the group: separate ones would make the branch-trunk overlap glow. */
 .graph-branch-strokes {
   stroke: #e6ebe7;
   opacity: 0.24;
@@ -107,9 +95,7 @@
 
 .js-enabled .graph-branch-trunk,
 .js-enabled .graph-branch-curve {
-  /* The dash offsets start fully retracted. Without script they stay at 0,
-     which draws the whole path — clipped by the SVG to the row's height, so it
-     looks identical to a finished stroke. */
+  /* Without script the offsets stay 0, which draws the full path clipped to the row. */
   transition: stroke-dashoffset 0.6s linear;
 }
 
@@ -189,7 +175,6 @@
 /* ---- Commit head ------------------------------------------------------- */
 
 .commit-row.is-dimmed {
-  /* Everything that is not the open commit steps back rather than competing. */
   opacity: 0.32;
 }
 
@@ -295,8 +280,6 @@
     background 0.3s ease;
 }
 
-/* Hovering the head brightens the whole control, not just the button under the
-   cursor — the entire head is the target. */
 .commit-row:not(.is-open) .commit-head:hover .commit-cue {
   color: var(--palette-accent);
   border-color: color-mix(in srgb, var(--palette-accent) 35%, transparent);
@@ -338,8 +321,7 @@
   opacity: 1;
 }
 
-/* Only used while folding a commit fully closed — see commit-row-expansion.ts
-   for why a switch collapses instantly and a close does not. */
+/* Only while closing. A switch collapses instantly; commit-row-expansion.ts says why. */
 .commit-body.is-collapsing {
   transition:
     opacity 0.45s ease,
@@ -414,7 +396,7 @@
   font-size: 25px;
   letter-spacing: -0.035em;
   color: var(--text-display);
-  /* Without this the digits change width as they count and the value flickers. */
+  /* Fixed-width digits stop the count-up from jittering. */
   font-variant-numeric: tabular-nums;
 }
 
@@ -532,8 +514,7 @@
   overflow: hidden;
 }
 
-/* Rides down the file as each line lands, the way a cursor would. Extends left
-   under the line numbers so it reads as a full-width row. */
+/* Extends under the 44px line numbers to span the full row. */
 .source-viewer-line-highlight {
   position: absolute;
   left: -44px;

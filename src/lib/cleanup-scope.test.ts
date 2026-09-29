@@ -1,17 +1,3 @@
-/**
- * Guards the cleanup mechanism the rest of the site is built on.
- *
- * Nineteen files own their timers, intervals and listeners through a scope, so a
- * regression here does not fail loudly — it leaks an interval, or lets a torn
- * down sequence write into replaced DOM one frame later. Both look fine in a
- * screenshot.
- *
- * The two properties worth pinning are *release* (disposal really does clear
- * what it registered) and *swallowing* (a callback that fires anyway does
- * nothing). They are separate: clearing a timer cannot help a listener that has
- * already been dispatched, and the guard inside each closure is what covers it.
- */
-
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CleanupScope } from "./cleanup-scope";
@@ -85,9 +71,8 @@ describe("timers", () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  // Asserting the timer is *gone*, not merely that its callback was swallowed.
-  // The guard alone would satisfy `not.toHaveBeenCalled()` while the handle
-  // stayed live, which for an interval means it fires forever.
+  // Check the timer count, not just the callback: the guard alone would pass
+  // while the handle stayed live.
   it("clears a pending timeout on dispose rather than only swallowing it", () => {
     const scope = new CleanupScope();
     const callback = vi.fn();
@@ -146,15 +131,8 @@ describe("listeners", () => {
     expect(listener).toHaveBeenCalledTimes(1);
   });
 
-  /**
-   * Pins the observable contract: nothing runs after disposal, even mid-dispatch.
-   *
-   * It does **not** isolate the `#disposed` check inside the wrapper. Removing
-   * that check leaves this green, because the DOM spec already stops a listener
-   * removed during dispatch from running — just as `clearTimeout` always beats
-   * the guard on the timer paths. Those inner checks are redundant defence that
-   * no test here can distinguish; do not expect one to catch their removal.
-   */
+  // This stays green without the `#disposed` guard: the DOM already skips a
+  // listener removed mid-dispatch. No test here can catch that guard's removal.
   it("does not run a listener for an event dispatched as the scope was disposed", () => {
     const scope = new CleanupScope();
     const target = new EventTarget();
@@ -193,19 +171,11 @@ describe("delay", () => {
     expect(resolved).toBe(true);
   });
 
-  /**
-   * The load-bearing case. An `async` sequence abandons itself mid-flight just
-   * by awaiting a disposed scope's `delay`, which is what replaces an
-   * `if (dead) return` check after every step — so this promise must stay
-   * pending forever rather than resolving late.
-   */
   it("never resolves once the scope is disposed", async () => {
     const scope = new CleanupScope();
     const pending = Symbol("pending");
-    // Racing against an already-resolved value distinguishes *pending* from
-    // *settled*. A flag set in `.then()` cannot: it would look identical if
-    // `delay` rejected on disposal, and a rejecting delay runs every `catch`
-    // and `finally` in the sequence that was supposed to be abandoned.
+    // The race tells pending from rejected; a `.then()` flag cannot. A rejecting
+    // delay would run the abandoned sequence's `catch` and `finally` blocks.
     const outcome = scope
       .delay(10)
       .then(() => "resolved" as const)

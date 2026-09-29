@@ -1,8 +1,3 @@
-/**
- * The console's commands. Each one is a row in `consoleCommands`, and `help` is
- * built from that table, so a command cannot exist without being listed.
- */
-
 import { nowEntries } from "../../content/personal-page-content";
 import { projectIds, projects, type ProjectId } from "../../content/projects";
 import { siteIdentity, technologies } from "../../content/site-identity";
@@ -22,7 +17,6 @@ interface ConsoleCommand {
   readonly name: string;
   readonly aliases?: readonly string[];
   readonly group: HelpGroup;
-  /** How `help` shows the command, when it takes an argument. */
   readonly usage?: string;
   readonly run: (argument: string, context: ConsoleCommandContext) => readonly HtmlFragment[];
 }

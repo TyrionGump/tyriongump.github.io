@@ -1,25 +1,11 @@
-/**
- * Keeps an element pinned at a fixed offset from the top of the viewport while
- * the document reflows underneath it.
- *
- * Opening a commit adds hundreds of pixels above the fold and, when switching
- * between commits, removes a similar amount in the same layout pass. Without
- * this, the row you clicked jumps out from under the cursor.
- *
- * Each frame it closes a fraction of the remaining gap rather than correcting
- * once, because layout keeps moving after the click — fonts settle, the body
- * refits as the source viewer fills in. A
- * single correction is right for one frame and wrong for the next thirty. And it
- * reads the real `window.scrollY` every frame: when the document shrinks the
- * browser clamps the scroll, and a tracked virtual position silently desyncs.
- */
+// Corrects every frame because layout keeps moving after the first one. Reads the real
+// `scrollY` each frame because the browser clamps scroll when the page shrinks.
 
 import type { CleanupScope } from "../cleanup-scope";
 import { prefersReducedMotion } from "./motion-preference";
 
-/** How much of the remaining distance to close each frame. */
 const FOLLOW_FACTOR = 0.28;
-/** Below this, snap — otherwise it creeps forever. */
+/** Below this, snap, or it creeps forever. */
 const SNAP_THRESHOLD_PX = 0.4;
 
 export interface ScrollAnchor {
@@ -31,8 +17,7 @@ function maximumScrollY(): number {
 }
 
 function setOverflowAnchor(value: string): void {
-  // Native scroll anchoring would fight us for control, holding onto whichever
-  // node it picked before the layout changed.
+  // Native scroll anchoring would fight this, holding the node it picked before the change.
   document.documentElement.style.setProperty("overflow-anchor", value);
   document.body.style.setProperty("overflow-anchor", value);
 }
@@ -46,8 +31,7 @@ export function holdElementInPlace(
   let aborted = false;
   let frameHandle: number | null = null;
   const startedAt = performance.now();
-  // Reduced motion still wants the element held — it is compensation, not
-  // decoration — but it should arrive at once rather than gliding.
+  // Reduced motion still needs the hold; it just arrives at once.
   const followFactor = prefersReducedMotion() ? 1 : FOLLOW_FACTOR;
 
   const release = (): void => {
