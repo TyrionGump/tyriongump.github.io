@@ -18,6 +18,8 @@ vitest.config.ts.timestamp-*
 
 # ── Tooling artefacts ─────────────────────────────────────────────────────────
 coverage/
+test-results/
+playwright-report/
 *.tsbuildinfo
 
 # ── Secrets ───────────────────────────────────────────────────────────────────
