@@ -42,7 +42,7 @@ button {
 }
 
 ::selection {
-  background: rgba(var(--palette-accent-rgb), 0.28);
+  background: color-mix(in srgb, var(--palette-accent) 28%, transparent);
 }
 
 /* Terminals get the green selection instead — inside a shell, the accent reads
@@ -50,7 +50,7 @@ button {
    itself. */
 .terminal-selection ::selection,
 .terminal-selection::selection {
-  background: rgba(var(--palette-status-rgb), 0.26);
+  background: color-mix(in srgb, var(--palette-status) 26%, transparent);
 }
 
 :focus-visible {

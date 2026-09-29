@@ -1,34 +1,21 @@
-/**
- * Design tokens. The values are exact — take them from the design rather than
- * eyeballing a near-enough one.
- *
- * The palette below is the "Bone" theme, which is the default and the one the
- * design was tuned on. Alternate themes override a handful of these in
- * `themes.css`; everything else is theme-independent.
- */
+/** Design tokens. The values are exact: take them from the design, not by eye. */
 
 :root {
-  /* ---- Palette: themed ------------------------------------------------ */
+  /* ---- Palette --------------------------------------------------------- */
   /* Accent. Carets, links, arrows, ref labels, active states. */
   --palette-accent: #d8d4cc;
-  --palette-accent-rgb: 216, 212, 204;
 
-  /* Status green. Prompt glyph, "open to work", the live dot. Bone pins this
-     to green; other themes let it follow the accent. */
+  /* Status green. Prompt glyph, "open to work", the live dot. */
   --palette-status: #7fbf95;
-  --palette-status-rgb: 127, 191, 149;
 
   /* Ink: text colour on accent-filled chips. */
   --palette-ink: #131211;
 
   --palette-background: #0b0b0a;
-  --palette-background-rgb: 11, 11, 10;
   --palette-band: #080807;
   --palette-panel: #0f0f0e;
 
-  /* ---- Palette: fixed greys ------------------------------------------- */
-  /* Named for the role each plays. These do not change between themes — a theme
-     moves the accent, not the neutrals. */
+  /* ---- Greys, named for the role each plays ---------------------------- */
   --text-display: #f2f6f3; /* display headlines */
   --text-primary: #edf1ec; /* primary text, project names */
   --text-primary-soft: #e6ebe7; /* logo, active nav */

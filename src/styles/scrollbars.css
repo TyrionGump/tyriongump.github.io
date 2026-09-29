@@ -8,7 +8,8 @@
 
 html {
   scrollbar-width: thin;
-  scrollbar-color: rgba(var(--palette-accent-rgb), 0.17) var(--palette-background);
+  scrollbar-color: color-mix(in srgb, var(--palette-accent) 17%, transparent)
+    var(--palette-background);
 }
 
 ::-webkit-scrollbar {
@@ -22,7 +23,7 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(var(--palette-accent-rgb), 0.15);
+  background: color-mix(in srgb, var(--palette-accent) 15%, transparent);
   border: 3.5px solid transparent;
   background-clip: padding-box;
   border-radius: 11px;
@@ -30,7 +31,7 @@ html {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(var(--palette-accent-rgb), 0.34);
+  background: color-mix(in srgb, var(--palette-accent) 34%, transparent);
   background-clip: padding-box;
 }
 
