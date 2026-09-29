@@ -1,0 +1,19 @@
+.not-found-page-frame {
+  display: flex;
+  flex-direction: column;
+  padding-top: 64px;
+  font-family: var(--font-mono);
+}
+
+.not-found-message {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: inherit;
+  line-height: 1.8;
+  color: var(--text-primary-soft);
+}
+
+.not-found-footer {
+  margin-top: auto;
+  padding-top: 104px;
+}

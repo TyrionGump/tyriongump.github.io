@@ -12,7 +12,7 @@
  * no hard-coded height to go stale at an awkward width.
  */
 
-import { CleanupScope, type CleanupFunction } from "../../lib/cleanup-scope";
+import { CleanupScope } from "../../lib/cleanup-scope";
 import { prefersReducedMotion } from "../../lib/motion/motion-preference";
 import { siteIdentity } from "../../content/site-identity";
 import { findElement, requireElement } from "../../lib/dom-queries";
@@ -63,9 +63,9 @@ function startPanelFocusDimming(panel: HTMLElement, scope: CleanupScope): void {
   setWindowFocused(true);
 }
 
-export function mountHomePage(panel: HTMLElement): CleanupFunction {
+export function mountHomePage(main: HTMLElement): void {
   const scope = new CleanupScope();
-  const dispose = (): void => scope.dispose();
+  const panel = requireElement(main, "[data-home-terminal-panel]");
 
   startPanelClock(panel, scope);
   startPanelFocusDimming(panel, scope);
@@ -75,7 +75,7 @@ export function mountHomePage(panel: HTMLElement): CleanupFunction {
   if (prefersReducedMotion()) {
     // Nothing to replay — the session is already on screen in its final state.
     activateHomeNavigationMenu(requireElement(bakedTranscript, "[data-home-terminal-menu]"), scope);
-    return dispose;
+    return;
   }
 
   // Kept in the layout so it goes on sizing the panel, but taken out of the
@@ -88,16 +88,7 @@ export function mountHomePage(panel: HTMLElement): CleanupFunction {
   stage.className = "home-terminal-transcript home-terminal-transcript-stage";
   requireElement(panel, ".home-terminal-body").appendChild(stage);
 
-  scope.onDispose(() => {
-    stage.remove();
-    bakedTranscript.classList.remove("is-sizing-replica");
-    bakedTranscript.removeAttribute("aria-hidden");
-    bakedTranscript.removeAttribute("inert");
-  });
-
   void playHomeIntroSequence(stage, scope).then((menu) => {
     activateHomeNavigationMenu(menu, scope);
   });
-
-  return dispose;
 }

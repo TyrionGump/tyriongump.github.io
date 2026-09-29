@@ -21,6 +21,7 @@ test.beforeEach(async ({ page }) => {
     .getByRole("navigation", { name: "Primary" })
     .getByRole("link", { name: "Personal", exact: true })
     .click();
+  await page.waitForURL("**/personal/");
 });
 
 test("the backtick key opens the console, and `help` lists the commands", async ({ page }) => {
@@ -73,7 +74,7 @@ test("the transcript is still there after a route command", async ({ page }) => 
   await openConsole(page);
   await run(page, "whoami");
   await run(page, "work");
-  await expect(page.locator("[data-work-graph]")).toBeVisible();
+  await page.waitForURL("**/work/");
 
   await openConsole(page);
   await expect(output(page)).toContainText("software engineer");

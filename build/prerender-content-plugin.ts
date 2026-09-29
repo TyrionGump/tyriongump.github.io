@@ -1,59 +1,46 @@
 /**
- * Bakes rendered content into `index.html` at build time.
+ * Fills each HTML file's `<!--prerender:name-->` slots at build time and on every
+ * dev-server request, so every page ships as real HTML.
  *
- * This is what lets content live in one place (typed modules under `src/content`)
- * while still shipping as real HTML. `index.html` marks slots with
- * `<!--prerender:name-->` comments, and this plugin swaps each for the markup its
- * renderer produces.
- *
- * The alternative — rendering pages from script on load — would mean the served
- * document is an empty div, which costs the page its crawlable content and gives
- * anyone on a slow connection a blank screen while the bundle arrives.
- *
- * Renderers must be pure string functions with no DOM access, since they run
- * here in Node.
+ * A file names its page with `<html data-page="…">`, and each renderer receives
+ * that id. Renderers run here in Node, so they must not touch the DOM.
  */
 
 import type { Plugin } from "vite";
 
 import { renderFragmentToMarkup, type HtmlFragment } from "../src/lib/html-template";
 
-export type PrerenderSlots = Readonly<Record<string, () => HtmlFragment>>;
+export type PrerenderSlots = Readonly<Record<string, (pageId: string) => HtmlFragment>>;
 
 const SLOT_PATTERN = /<!--prerender:([a-z0-9-]+)-->/g;
-
-function slotToken(slotName: string): string {
-  return `<!--prerender:${slotName}-->`;
-}
+const PAGE_ID_PATTERN = /<html\b[^>]*\bdata-page="([^"]+)"/;
 
 export function prerenderContentPlugin(slots: PrerenderSlots): Plugin {
   return {
     name: "prerender-content",
     transformIndexHtml: {
       order: "pre",
-      handler(documentMarkup) {
-        let result = documentMarkup;
-
-        for (const [slotName, render] of Object.entries(slots)) {
-          const token = slotToken(slotName);
-          if (!result.includes(token)) {
-            throw new Error(
-              `prerender-content: no "${token}" slot found in index.html. ` +
-                `Either add the slot or drop the renderer from vite.config.ts.`,
-            );
-          }
-          result = result.replace(token, renderFragmentToMarkup(render()));
+      handler(documentMarkup, context) {
+        const pageId = PAGE_ID_PATTERN.exec(documentMarkup)?.[1];
+        if (!pageId) {
+          throw new Error(`prerender-content: ${context.path} has no <html data-page="…">.`);
         }
 
-        // A slot with no renderer would otherwise ship as a silent empty
-        // comment — the page would just be missing a section.
+        let result = documentMarkup;
+        for (const [slotName, render] of Object.entries(slots)) {
+          const token = `<!--prerender:${slotName}-->`;
+          if (!result.includes(token)) {
+            throw new Error(`prerender-content: ${context.path} has no "${token}" slot.`);
+          }
+          result = result.replace(token, renderFragmentToMarkup(render(pageId)));
+        }
+
         const unfilled = [...result.matchAll(SLOT_PATTERN)].map((match) => match[1]);
         if (unfilled.length > 0) {
           throw new Error(
-            `prerender-content: index.html has slots with no renderer: ${unfilled.join(", ")}.`,
+            `prerender-content: ${context.path} has slots with no renderer: ${unfilled.join(", ")}.`,
           );
         }
-
         return result;
       },
     },

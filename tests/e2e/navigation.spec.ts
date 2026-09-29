@@ -58,3 +58,38 @@ test("the pages are readable without JavaScript", async ({ browser }) => {
 
   await context.close();
 });
+
+for (const [path, title] of [
+  ["/", "Andrew — Software Engineer"],
+  ["/work/", "Work — Andrew"],
+  ["/personal/", "Personal — Andrew"],
+] as const) {
+  test(`${path} has its own title`, async ({ page }) => {
+    await page.goto(path);
+    await expect(page).toHaveTitle(title);
+  });
+}
+
+test("an old #route link lands on the real page", async ({ page }) => {
+  await page.goto("/#work");
+  await expect(page).toHaveURL(/\/work\/$/);
+  await expectOnWork(page);
+});
+
+test("the 404 page links back to Home", async ({ page }) => {
+  await page.goto("/404.html");
+  await expect(page.getByRole("heading", { name: "zsh: no such page" })).toBeVisible();
+
+  await page.getByRole("link", { name: "Home →" }).click();
+  await expectOnHome(page);
+});
+
+test("the skip link moves focus past the navigation", async ({ page }) => {
+  await page.goto("/personal/");
+  await page.keyboard.press("Tab");
+  const skipLink = page.getByRole("link", { name: "Skip to content" });
+  await expect(skipLink).toBeFocused();
+
+  await page.keyboard.press("Enter");
+  await expect(page.locator("main")).toBeFocused();
+});

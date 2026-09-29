@@ -1,4 +1,4 @@
-/** The shell every page sits inside, and how routes are shown and hidden. */
+/** The shell every page sits inside. */
 
 .site-shell {
   min-height: 100vh;
@@ -9,37 +9,10 @@
   overflow-x: clip;
 }
 
-/**
- * Routes are toggled, not unmounted. The site is three static pages with a
- * combined weight of a few kilobytes, so keeping them all in the document costs
- * nothing and means a route change is one class flip with no re-render.
- *
- * Two mechanisms show a page, and they cannot contradict each other because both
- * read the same hash:
- *
- *   `:target`     — the browser's own. Covers the window before the bundle has
- *                   parsed, and covers visitors with JavaScript off entirely.
- *   `.is-active`  — the router's, once it is running. Adds the entrance.
- */
 .site-page {
-  display: none;
-  /* The id that makes `:target` work also makes the browser scroll to it. Keep
-     that landing spot clear of the sticky nav. */
+  display: block;
+  /* The skip link targets this, so keep it clear of the sticky nav. */
   scroll-margin-top: var(--site-navigation-height);
-}
-
-.site-page:target {
-  display: block;
-}
-
-/* Home is the fallback for a missing or unrecognised hash — matching what
-   `readRouteNameFromHash` does on the script side. */
-html:not(:has(.site-page:target)) .site-page[data-page="home"] {
-  display: block;
-}
-
-.site-page.is-active {
-  display: block;
   animation: rise-in 0.6s var(--easing-movement) both;
 }
 
@@ -65,36 +38,23 @@ html:not(:has(.site-page:target)) .site-page[data-page="home"] {
   min-height: calc(100vh - var(--site-navigation-height));
 }
 
-/**
- * Off-screen until focused, then it lands in the top-left corner. Every route
- * starts with the same nav, so a keyboard visitor would otherwise tab through it
- * again on every page.
- */
-/* Its handler lives in main.ts, so without script it would be a control that
-   does nothing — worse than not offering one. */
+/** Off-screen until focused, so a keyboard visitor can skip the nav on every page. */
 .skip-link {
-  display: none;
-}
-
-.js-enabled .skip-link {
-  display: block;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 200;
   transform: translateY(-120%);
   padding: 10px 18px;
-  border: 0;
   border-bottom-right-radius: 4px;
   background: var(--palette-accent);
   color: var(--palette-ink);
   font-family: var(--font-mono);
   font-size: 12px;
-  cursor: pointer;
   transition: transform 0.2s var(--easing-movement);
 }
 
-.js-enabled .skip-link:focus-visible {
+.skip-link:focus-visible {
   transform: translateY(0);
   outline-offset: -3px;
 }
@@ -103,4 +63,15 @@ html:not(:has(.site-page:target)) .site-page[data-page="home"] {
    otherwise draw a ring around the entire page. */
 main:focus {
   outline: none;
+}
+
+/* Cross-fades between pages, where the browser supports it. */
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
 }

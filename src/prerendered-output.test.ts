@@ -11,7 +11,6 @@
 
 import { describe, expect, it } from "vitest";
 
-import documentMarkup from "../index.html?raw";
 import { renderConsoleOverlay } from "./chrome/console/render-console-overlay";
 import { renderHomePage } from "./pages/home/render-home-page";
 import { renderPersonalPage } from "./pages/personal/render-personal-page";
@@ -19,14 +18,15 @@ import { renderScrollProgressRing } from "./chrome/scroll-ring/render-scroll-pro
 import { renderSiteNavigation } from "./chrome/navigation/render-site-navigation";
 import { renderWorkPage } from "./pages/work/render-work-page";
 import { projects, workGraphProjectIds } from "./content/projects";
-import { routeNames } from "./site-pages";
+import { notFoundPageId, renderPageHead } from "./render-page-document";
+import { sitePages, siteUrl } from "./site-pages";
 import { renderFragmentToMarkup } from "./lib/html-template";
 import cascadeManifest from "./styles/index.css?raw";
 
 const home = renderFragmentToMarkup(renderHomePage());
 const work = renderFragmentToMarkup(renderWorkPage());
 const personal = renderFragmentToMarkup(renderPersonalPage());
-const navigation = renderFragmentToMarkup(renderSiteNavigation());
+const navigation = renderFragmentToMarkup(renderSiteNavigation("work"));
 const everything = [home, work, personal, navigation].join("\n");
 
 describe("Home", () => {
@@ -123,24 +123,58 @@ describe("every prerendered fragment", () => {
   });
 });
 
-describe("the document and the route list", () => {
-  /**
-   * The prerender plugin's slot pattern matches the `<!--prerender:name-->`
-   * comment and nothing else — it never reads `id` or `data-page`. So a route
-   * with a slot but no wrapping section satisfies the plugin, `tsc`, every test
-   * above and `vite build`, and then `main.ts` finds no active page and the
-   * route ships blank. This is the only assertion that reads the document.
-   */
-  it("gives every route a prerender slot inside its own section", () => {
-    for (const route of routeNames) {
-      // The pair, not the two halves separately: a slot that sits outside its
-      // section satisfies the plugin and every other gate, and then ships an
-      // empty page. Route slots are named `<route>-page`; the three slots for
-      // the nav and the overlays are not — see the slot map in `vite.config.ts`.
-      expect(documentMarkup).toMatch(
-        new RegExp(`<section[^>]*data-page="${route}"[^>]*>\\s*<!--prerender:${route}-page-->`),
-      );
+describe("the HTML files", () => {
+  const htmlFiles = import.meta.glob(
+    ["../index.html", "../*/index.html", "../404.html", "!../dist/**", "!../node_modules/**"],
+    { query: "?raw", import: "default", eager: true },
+  ) as Record<string, string>;
+
+  const pageIdOf = (markup: string) => /<html\b[^>]*\bdata-page="([^"]+)"/.exec(markup)?.[1];
+
+  it("has exactly one file per page, at the page's path", () => {
+    const expected = Object.fromEntries([
+      ...sitePages.map((page) => [`..${page.path}index.html`, page.route]),
+      ["../404.html", notFoundPageId],
+    ]);
+    const actual = Object.fromEntries(
+      Object.entries(htmlFiles).map(([path, markup]) => [path, pageIdOf(markup)]),
+    );
+    expect(actual).toEqual(expected);
+  });
+});
+
+describe("each page's head", () => {
+  const head = (pageId: string) => renderFragmentToMarkup(renderPageHead(pageId));
+
+  it("gives every page its own title, description and canonical URL", () => {
+    for (const page of sitePages) {
+      const markup = head(page.route);
+      expect(markup).toContain(`<title>${page.title}</title>`);
+      expect(markup).toContain(`<link rel="canonical" href="${siteUrl}${page.path}" />`);
+      expect(markup).toContain(`<meta property="og:url" content="${siteUrl}${page.path}" />`);
     }
+    expect(new Set(sitePages.map((page) => page.title)).size).toBe(sitePages.length);
+  });
+
+  it("keeps the 404 page out of search results", () => {
+    expect(head(notFoundPageId)).toContain('<meta name="robots" content="noindex" />');
+    expect(head(notFoundPageId)).not.toContain("canonical");
+  });
+
+  it("sends old #route links on from Home only", () => {
+    expect(head("home")).toContain("location.replace");
+    expect(head("work")).not.toContain("location.replace");
+  });
+
+  it("rejects a page id that is not a page", () => {
+    expect(() => head("blog")).toThrow(/neither a route/);
+  });
+});
+
+describe("the navigation", () => {
+  it("marks only the current page", () => {
+    expect(navigation.match(/aria-current="page"/g)).toHaveLength(1);
+    expect(navigation).toMatch(/href="\/work\/"\s+aria-current="page"/);
   });
 });
 
