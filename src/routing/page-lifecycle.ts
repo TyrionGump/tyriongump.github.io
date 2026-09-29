@@ -11,7 +11,7 @@
  *    open, and get `onReturn` instead.
  */
 
-import type { CleanupFunction } from "../animation/cleanup-scope";
+import type { CleanupFunction } from "../lib/cleanup-scope";
 
 export interface MountedPage {
   readonly dispose: CleanupFunction;

@@ -21,16 +21,16 @@
 @import "./terminal-primitives.css";
 
 /* Components. */
-@import "../components/site-navigation/site-navigation.css";
-@import "../components/site-footer/site-footer.css";
-@import "../components/home-terminal-panel/home-terminal-panel.css";
-@import "../components/work-git-graph/work-git-graph.css";
-@import "../components/personal-page/personal-page.css";
+@import "../chrome/navigation/site-navigation.css";
+@import "../chrome/footer/site-footer.css";
+@import "../pages/home/home-page.css";
+@import "../pages/work/work-page.css";
+@import "../pages/personal/personal-page.css";
 
 /* Overlays, last — a grouping, not a requirement. The console's two
    `.is-console-open` trigger rules are the only place one component stylesheet
    reaches into another, and neither depends on this position: naming two
    classes already outranks the resting rules wherever it sits, and it sets the
    exact values `:hover` sets, so their equal-weight tie has nothing to decide. */
-@import "../components/scroll-progress-ring/scroll-progress-ring.css";
-@import "../components/console-overlay/console-overlay.css";
+@import "../chrome/scroll-ring/scroll-progress-ring.css";
+@import "../chrome/console/console-overlay.css";

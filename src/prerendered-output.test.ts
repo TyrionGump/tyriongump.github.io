@@ -12,15 +12,15 @@
 import { describe, expect, it } from "vitest";
 
 import documentMarkup from "../index.html?raw";
-import { renderConsoleOverlay } from "./components/console-overlay/render-console-overlay";
-import { renderHomePage } from "./components/home-terminal-panel/render-home-terminal-panel";
-import { renderPersonalPage } from "./components/personal-page/render-personal-page";
-import { renderScrollProgressRing } from "./components/scroll-progress-ring/render-scroll-progress-ring";
-import { renderSiteNavigation } from "./components/site-navigation/render-site-navigation";
-import { renderWorkPage } from "./components/work-git-graph/render-work-git-graph";
+import { renderConsoleOverlay } from "./chrome/console/render-console-overlay";
+import { renderHomePage } from "./pages/home/render-home-page";
+import { renderPersonalPage } from "./pages/personal/render-personal-page";
+import { renderScrollProgressRing } from "./chrome/scroll-ring/render-scroll-progress-ring";
+import { renderSiteNavigation } from "./chrome/navigation/render-site-navigation";
+import { renderWorkPage } from "./pages/work/render-work-page";
 import { projects, workGraphProjectIds } from "./content/projects";
 import { defaultRouteName, routeNames } from "./routing/route-names";
-import { renderFragmentToMarkup } from "./shared/html-template";
+import { renderFragmentToMarkup } from "./lib/html-template";
 import cascadeManifest from "./styles/index.css?raw";
 
 const home = renderFragmentToMarkup(renderHomePage());
@@ -179,7 +179,8 @@ describe("the cascade manifest", () => {
   const manifest = "./styles/index.css";
   const stylesheetsOnDisk = [
     ...Object.keys(import.meta.glob("./styles/*.css")),
-    ...Object.keys(import.meta.glob("./components/*/*.css")),
+    ...Object.keys(import.meta.glob("./chrome/*/*.css")),
+    ...Object.keys(import.meta.glob("./pages/*/*.css")),
   ]
     .filter((path) => path !== manifest)
     // Rewritten as `index.css` has to write them: its own siblings by name,

@@ -18,31 +18,15 @@
 
   "overrides": [
     {
-      "files": ["src/shared/**"],
+      "files": ["src/lib/**"],
       "rules": {
         "no-restricted-imports": [
           "error",
           {
             "patterns": [
               {
-                "regex": "(\\.\\./)+(src/)?(animation|routing|content|components)/",
-                "message": "shared/ is the floor: it imports nothing outside itself. See docs/architecture.md."
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "files": ["src/animation/**"],
-      "rules": {
-        "no-restricted-imports": [
-          "error",
-          {
-            "patterns": [
-              {
-                "regex": "(\\.\\./)+(src/)?(routing|content|components)/",
-                "message": "animation/ must stay site-ignorant — no routes, copy or components. See docs/architecture.md."
+                "regex": "(\\.\\./)+(src/)?(routing|content|chrome|pages)/",
+                "message": "lib/ is the floor: it knows nothing about this site."
               }
             ]
           }
@@ -57,8 +41,8 @@
           {
             "patterns": [
               {
-                "regex": "(\\.\\./)+(src/)?(content|components)/",
-                "message": "routing/ may not reach content/ or components/. See docs/architecture.md."
+                "regex": "(\\.\\./)+(src/)?(content|chrome|pages)/",
+                "message": "routing/ may not reach content, chrome or pages."
               }
             ]
           }
@@ -73,8 +57,8 @@
           {
             "patterns": [
               {
-                "regex": "(\\.\\./)+(src/)?components/",
-                "message": "content/ is data: it may not import components. See docs/architecture.md."
+                "regex": "(\\.\\./)+(src/)?(lib|chrome|pages)/",
+                "message": "content/ is data: it may not import code."
               }
             ]
           }
@@ -82,15 +66,39 @@
       }
     },
     {
-      "files": ["src/components/**"],
+      "files": ["src/chrome/**"],
       "rules": {
         "no-restricted-imports": [
           "error",
           {
             "patterns": [
               {
-                "regex": "(\\.\\./)+[^/]+/mount-",
-                "message": "Components never reach for each other's behaviour — mount-* are wired only in main.ts. render-* may be composed freely."
+                "regex": "(\\.\\./)+(src/)?pages/",
+                "message": "chrome/ is on every page, so it may not depend on one."
+              },
+              {
+                "regex": "(\\.\\./)+([^/.]+/)+mount-",
+                "message": "mount-* are wired only in main.ts. render-* may be composed freely."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/pages/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "^\\.\\./[^./][^/]*/",
+                "message": "A page may not import another page."
+              },
+              {
+                "regex": "(\\.\\./)+([^/.]+/)+mount-",
+                "message": "mount-* are wired only in main.ts. render-* may be composed freely."
               }
             ]
           }
@@ -105,16 +113,16 @@
           {
             "patterns": [
               {
-                "regex": "(\\.\\./)*src/(animation|routing|content|styles)/",
-                "message": "build/ runs in Node with no DOM. It may import only shared/html-template and the render-* named in the slot map."
+                "regex": "(\\.\\./)*src/(lib/motion|routing|content|styles)/",
+                "message": "build/ runs in Node with no DOM. It may import only lib/html-template and render-* modules."
               },
               {
-                "regex": "(\\.\\./)*src/shared/dom-",
-                "message": "build/ runs in Node with no DOM: dom-queries and dom-rendering need a live document."
+                "regex": "(\\.\\./)*src/lib/dom-",
+                "message": "build/ runs in Node with no DOM: the dom-* helpers need a live document."
               },
               {
-                "regex": "(\\.\\./)*src/components/[^/]+/mount-",
-                "message": "build/ runs in Node with no DOM — mount-* modules touch the document."
+                "regex": "(\\.\\./)*src/(chrome|pages)/[^/]+/mount-",
+                "message": "build/ runs in Node with no DOM: mount-* modules touch the document."
               }
             ]
           }

@@ -109,7 +109,7 @@ Nothing in `.oxlintrc.json` weakens a rule. Everything there is additive: the
 `import` plugin for cycle detection, and per-directory `no-restricted-imports`
 patterns that enforce the import direction described in
 [architecture.md](architecture.md). Before that config existed the ordering was a
-claim in prose; now `animation/` reaching into `content/` fails CI with a message
+claim in prose; now `lib/` reaching into `content/` fails CI with a message
 naming the rule it broke. `import/no-unassigned-import` is the single `"off"`,
 because `main.ts` imports the stylesheet for its side effect and that is correct.
 
@@ -119,9 +119,9 @@ Three things to know before editing those overrides:
   crate). "Everything under `src/` except these two" cannot be written directly,
   which is why the `build/` rule names the directories it forbids rather than the
   ones it allows. Add a new forbidden path when you add a new layer.
-- **Patterns must tolerate every spelling of the same import.** `../animation/`
-  and `../../src/animation/` reach the same module; a pattern anchored only to
-  `\.\./animation/` misses the second and the boundary silently has a hole. The
+- **Patterns must tolerate every spelling of the same import.** `../lib/`
+  and `../../src/lib/` reach the same module; a pattern anchored only to
+  `\.\./lib/` misses the second and the boundary silently has a hole. The
   patterns here use `(\.\./)+(src/)?` for that reason.
 - **The patterns match relative specifiers**, so they hold only while imports
   stay relative. Adding a tsconfig path alias would route around all of them.
@@ -136,8 +136,8 @@ There are exactly two, both scoped to a single loop and both carrying their
 reason inline:
 
 ```
-src/animation/type-into-element.ts                      no-await-in-loop
-src/components/work-git-graph/graph-draw-sequence.ts    no-await-in-loop
+src/lib/motion/type-into-element.ts    no-await-in-loop
+src/pages/work/graph-draw-sequence.ts  no-await-in-loop
 ```
 
 Both are animation sequences that are serial _by definition_ — a typewriter, and

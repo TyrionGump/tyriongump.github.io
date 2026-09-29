@@ -16,7 +16,7 @@
 
 import type { Plugin } from "vite";
 
-import { renderFragmentToMarkup, type HtmlFragment } from "../src/shared/html-template";
+import { renderFragmentToMarkup, type HtmlFragment } from "../src/lib/html-template";
 
 export type PrerenderSlots = Readonly<Record<string, () => HtmlFragment>>;
 
