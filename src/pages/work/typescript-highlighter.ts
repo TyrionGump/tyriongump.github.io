@@ -1,72 +1,65 @@
-// Not a parser: it only has to handle the snippets in `src/content/projects.ts`.
+// Runs only at build time, in the prerender step. Shiki must never reach the browser bundle.
 
-import { escapeHtml, unsafeTrustedHtml, type HtmlFragment } from "../../lib/html-template";
+import { createHighlighterCoreSync, type ThemeRegistration } from "shiki/core";
+import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
+import typescript from "shiki/langs/typescript.mjs";
 
-type TokenClass =
-  | "comment"
-  | "string"
-  | "keyword"
-  | "literal"
-  | "type"
-  | "function"
-  | "property"
-  | "punctuation"
-  | "text";
+import { html, type HtmlFragment } from "../../lib/html-template";
 
-interface TokenRule {
-  readonly pattern: RegExp;
-  /** `null` consumes the match but leaves it unstyled. */
-  readonly tokenClass: TokenClass | null;
-}
+// Each colour is a CSS variable, so work-page.css keeps control of the palette.
+const tokenColor = (name: string): string => `var(--code-token-${name})`;
 
-/** First match wins. Comments and strings come first so keywords inside them stay plain. */
-const TOKEN_RULES: readonly TokenRule[] = [
-  { pattern: /^\/\*[\s\S]*?\*\//, tokenClass: "comment" },
-  { pattern: /^\/\/[^\n]*/, tokenClass: "comment" },
-  { pattern: /^"(?:[^"\\]|\\.)*"/, tokenClass: "string" },
-  {
-    pattern:
-      /^\b(export|const|let|return|while|function|if|else|new|type|interface|as|async|await)\b/,
-    tokenClass: "keyword",
-  },
-  { pattern: /^\b(true|false|null|undefined)\b/, tokenClass: "literal" },
-  { pattern: /^\b\d[\w.]*\b/, tokenClass: "literal" },
-  { pattern: /^[A-Z][A-Za-z0-9_]*/, tokenClass: "type" },
-  { pattern: /^[a-zA-Z_$][\w$]*(?=\s*\()/, tokenClass: "function" },
-  { pattern: /^[a-zA-Z_$][\w$]*(?=\s*:)/, tokenClass: "property" },
-  { pattern: /^[{}()[\];:,.<>=!+\-*/&|?]+/, tokenClass: "punctuation" },
-  { pattern: /^\s+/, tokenClass: null },
-  { pattern: /^[^\s]/, tokenClass: "text" },
-];
+const siteTheme: ThemeRegistration = {
+  name: "site",
+  type: "dark",
+  fg: tokenColor("text"),
+  bg: "transparent",
+  settings: [
+    { settings: { foreground: tokenColor("text") } },
+    {
+      scope: ["comment", "punctuation.definition.comment"],
+      settings: { foreground: tokenColor("comment") },
+    },
+    {
+      scope: ["string", "punctuation.definition.string"],
+      settings: { foreground: tokenColor("string") },
+    },
+    { scope: ["keyword", "storage"], settings: { foreground: tokenColor("keyword") } },
+    {
+      scope: ["constant.numeric", "constant.language"],
+      settings: { foreground: tokenColor("literal") },
+    },
+    {
+      scope: ["entity.name.type", "entity.name.class", "support.type", "support.class"],
+      settings: { foreground: tokenColor("type") },
+    },
+    {
+      scope: ["entity.name.function", "support.function"],
+      settings: { foreground: tokenColor("function") },
+    },
+    {
+      scope: ["meta.object-literal.key", "variable.other.property", "support.variable.property"],
+      settings: { foreground: tokenColor("property") },
+    },
+    {
+      scope: ["punctuation", "keyword.operator", "meta.brace"],
+      settings: { foreground: tokenColor("punctuation") },
+    },
+  ],
+};
 
-/** A blank line returns `&nbsp;` so it keeps its row in the viewer's fixed line grid. */
-export function highlightTypeScriptLine(line: string): HtmlFragment {
-  let markup = "";
-  let remaining = line;
+const highlighter = createHighlighterCoreSync({
+  themes: [siteTheme],
+  langs: [typescript],
+  engine: createJavaScriptRegexEngine(),
+});
 
-  while (remaining.length > 0) {
-    let matchedText: string | null = null;
-    let matchedClass: TokenClass | null = null;
-
-    for (const rule of TOKEN_RULES) {
-      const match = rule.pattern.exec(remaining);
-      if (match && match[0].length > 0) {
-        matchedText = match[0];
-        matchedClass = rule.tokenClass;
-        break;
-      }
-    }
-
-    // No rule matched: consume one character so the loop always ends.
-    if (matchedText === null) {
-      matchedText = remaining[0] as string;
-      matchedClass = "text";
-    }
-
-    const escaped = escapeHtml(matchedText);
-    markup += matchedClass ? `<span class="code-token-${matchedClass}">${escaped}</span>` : escaped;
-    remaining = remaining.slice(matchedText.length);
-  }
-
-  return unsafeTrustedHtml(markup || "&nbsp;");
+/** One fragment per line, so the viewer can number and reveal lines one at a time. */
+export function highlightTypeScript(code: string): readonly HtmlFragment[] {
+  return highlighter.codeToTokensBase(code, { lang: "typescript", theme: "site" }).map((tokens) =>
+    tokens.length === 0
+      ? // Keeps a blank line one row tall in the viewer's line grid.
+        html`${" "}`
+      : html`${tokens.map((token) => html`<span style="color:${token.color}">${token.content}</span>`)}`,
+  );
 }

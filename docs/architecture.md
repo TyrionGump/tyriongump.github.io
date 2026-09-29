@@ -63,9 +63,12 @@ mount-work-page.ts    adds behaviour to markup that already exists.
 `vitest run` and `vite build` both run every `render-*` in Node. So a DOM call on
 the render path fails CI.
 
-`commit-formatting.ts`, `graph-geometry.ts` and `typescript-highlighter.ts` have
-no prefix. The render side and the mount side both use them, so they must stay
-free of the DOM too.
+`commit-formatting.ts` and `graph-geometry.ts` have no prefix. The render side
+and the mount side both use them, so they must stay free of the DOM too.
+
+`typescript-highlighter.ts` runs only on the render side. It uses Shiki, which
+must never reach the browser. A browser test fails if the shipped JavaScript
+contains Shiki or grows past 100 KB.
 
 ### 2. A `CleanupScope` owns every timer and listener
 

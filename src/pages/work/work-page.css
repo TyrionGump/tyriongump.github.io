@@ -595,32 +595,17 @@
 
 /* ---- Syntax tokens ----------------------------------------------------- */
 
-.code-token-comment {
-  color: #5b605c;
-}
-.code-token-string {
-  color: #9fb08a;
-}
-.code-token-keyword {
-  color: #a08cb8;
-}
-.code-token-literal {
-  color: #c0a183;
-}
-.code-token-type {
-  color: #86a3b8;
-}
-.code-token-function {
-  color: #7fa8b8;
-}
-.code-token-property {
-  color: #d2d5d0;
-}
-.code-token-punctuation {
-  color: #697070;
-}
-.code-token-text {
-  color: #c9ccc7;
+/* The highlighter colours each token with one of these variables. */
+.source-viewer {
+  --code-token-comment: #5b605c;
+  --code-token-string: #9fb08a;
+  --code-token-keyword: #a08cb8;
+  --code-token-literal: #c0a183;
+  --code-token-type: #86a3b8;
+  --code-token-function: #7fa8b8;
+  --code-token-property: #d2d5d0;
+  --code-token-punctuation: #697070;
+  --code-token-text: #c9ccc7;
 }
 
 /* ---- Responsive -------------------------------------------------------- */

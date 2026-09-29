@@ -1,4 +1,5 @@
 import { projectIds, type ProjectId } from "../../content/projects";
+import { workCommandText } from "../../content/work-page-content";
 import { CleanupScope, type CleanupFunction } from "../../lib/cleanup-scope";
 import { requireElement } from "../../lib/dom-queries";
 import { prefersReducedMotion } from "../../lib/motion/motion-preference";
@@ -6,7 +7,6 @@ import { typeTextIntoElement, type TypingSpeed } from "../../lib/motion/type-int
 import { readSessionValue, writeSessionValue } from "../../lib/session-store";
 import { mountCommitExpansion } from "./commit-row-expansion";
 import { createGraphDrawSequence } from "./graph-draw-sequence";
-import { workCommandText } from "./render-work-page";
 
 const COMMAND_TYPING_SPEED: TypingSpeed = { minimumDelayMs: 29, maximumDelayMs: 36 };
 const COMMAND_START_DELAY_MS = 200;

@@ -1,15 +1,12 @@
 // Runs in Node at build time, so nothing here or in its imports may touch the DOM.
 
 import { projects, workGraphProjectIds, type Project } from "../../content/projects";
-import { siteIdentity } from "../../content/site-identity";
-import { workHeadlineLines, workIntro } from "../../content/work-page-content";
+import { workCommandText, workHeadlineLines, workIntro } from "../../content/work-page-content";
 import { renderSiteFooter } from "../../chrome/footer/render-site-footer";
 import { html, type HtmlFragment } from "../../lib/html-template";
 import { buildStatBars, formatLineCount, formatMetricValue } from "./commit-formatting";
 import { buildBranchCurvePath, buildTrunkPath, graphGeometry as geometry } from "./graph-geometry";
-import { highlightTypeScriptLine } from "./typescript-highlighter";
-
-export const workCommandText = `git log --graph --stat --author=${siteIdentity.handle}`;
+import { highlightTypeScript } from "./typescript-highlighter";
 
 function nodeOffsetStyle(centreX: number, centreY: number): string {
   const half = geometry.nodeSize / 2;
@@ -106,7 +103,7 @@ function renderCodeLine(code: HtmlFragment): HtmlFragment {
 }
 
 function renderSourceViewer(project: Project): HtmlFragment {
-  const codeLines = project.sourceCode.split("\n");
+  const codeLines = highlightTypeScript(project.sourceCode);
   const stats = buildStatBars(project.commit.linesAdded, project.commit.linesRemoved);
   const filePath = `src/${project.id}.ts`;
 
@@ -150,9 +147,7 @@ function renderSourceViewer(project: Project): HtmlFragment {
               data-source-line-highlight
               aria-hidden="true"
             ></div>
-            <div class="source-viewer-code" data-source-code>
-              ${codeLines.map((line) => renderCodeLine(highlightTypeScriptLine(line)))}
-            </div>
+            <div class="source-viewer-code" data-source-code>${codeLines.map(renderCodeLine)}</div>
           </div>
         </div>
 

@@ -29,6 +29,7 @@
     "@playwright/test": "^1.63.0",
     "oxfmt": "^0.62.0",
     "oxlint": "^1.77.0",
+    "shiki": "^4.4.3",
     "typescript": "^7.0.2",
     "vite": "^7.1.12",
     "vitest": "^4.1.10"
