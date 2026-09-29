@@ -24,8 +24,6 @@ import { waitForTransitionEnd } from "../../lib/motion/wait-for-transition-end";
 import { findAllElements, findElement } from "../../lib/dom-queries";
 import { branchCurveStartY, graphGeometry as geometry, strokeDurationMs } from "./graph-geometry";
 
-/** How long the whole drawing waits after mount, so the command finishes typing first. */
-const DELAY_BEFORE_DRAW_MS = 1620;
 /** A beat between the HEAD node landing and its trunk starting to run. */
 const DELAY_AFTER_HEAD_NODE_MS = 120;
 /** The branch node lands as the corner finishes; the text follows just behind it. */
@@ -50,7 +48,7 @@ function finishRowTrunkPath(row: HTMLElement): void {
 }
 
 export interface GraphDrawController {
-  /** Starts the draw after its opening delay. Safe to call once. */
+  /** Starts the draw. Does nothing after the first call, or after a snap. */
   play(): void;
   /** Puts every stroke, node and text block in its finished state immediately. */
   snapToFinalState(): void;
@@ -84,7 +82,7 @@ export function createGraphDrawSequence(
   let hasStarted = false;
   let hasSnapped = false;
 
-  const rows = findAllElements(graphRoot, ".graph-row");
+  const rows = findAllElements(graphRoot, "[data-graph-row]");
 
   async function drawHeadRow(row: HTMLElement): Promise<void> {
     reveal(row, "[data-graph-node]");
@@ -153,8 +151,9 @@ export function createGraphDrawSequence(
   async function drawEveryRow(): Promise<void> {
     /* oxlint-disable no-await-in-loop -- sequential by design; see above */
     for (const row of rows) {
-      if (row.classList.contains("graph-row-head")) await drawHeadRow(row);
-      else if (row.classList.contains("graph-row-root")) await drawRootRow(row);
+      const kind = row.dataset["graphRow"];
+      if (kind === "head") await drawHeadRow(row);
+      else if (kind === "root") await drawRootRow(row);
       else await drawCommitRow(row);
     }
     /* oxlint-enable no-await-in-loop */
@@ -164,10 +163,7 @@ export function createGraphDrawSequence(
     play() {
       if (hasStarted) return;
       hasStarted = true;
-      drawScope.setTimeout(() => {
-        if (hasSnapped) return;
-        void drawEveryRow();
-      }, DELAY_BEFORE_DRAW_MS);
+      void drawEveryRow();
     },
 
     snapToFinalState() {

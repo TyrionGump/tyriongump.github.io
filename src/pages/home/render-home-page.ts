@@ -122,7 +122,9 @@ export function renderHomePage(): HtmlFragment {
           </div>
           <span class="home-terminal-clock" data-home-terminal-clock>--:--</span>
         </header>
-        <div class="home-terminal-body terminal-selection">${renderHomeTranscript()}</div>
+        <div class="home-terminal-body terminal-selection" data-home-terminal-body>
+          ${renderHomeTranscript()}
+        </div>
       </section>
     </div>
   `;

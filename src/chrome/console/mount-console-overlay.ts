@@ -11,7 +11,7 @@
 
 import { CleanupScope, type CleanupFunction } from "../../lib/cleanup-scope";
 import { routeHref, type RouteName } from "../../site-pages";
-import { findAllElements, findElement, requireElement } from "../../lib/dom-queries";
+import { findAllElements, requireElement } from "../../lib/dom-queries";
 import { appendFragment } from "../../lib/dom-rendering";
 import { html, type HtmlFragment } from "../../lib/html-template";
 import { readSessionValue, writeSessionValue } from "../../lib/session-store";
@@ -33,13 +33,13 @@ export function mountConsoleOverlay(overlay: HTMLElement): CleanupFunction {
   const output = requireElement(overlay, "[data-console-output]");
   const typed = requireElement(overlay, "[data-console-typed]");
   const input = requireElement<HTMLInputElement>(overlay, "[data-console-input]");
-  const lastCommand = findElement(overlay, "[data-console-last]");
+  const lastCommand = requireElement(overlay, "[data-console-last]");
 
   const vitals = createConsoleVitals(
     {
-      fps: findElement(overlay, "[data-console-fps]"),
-      heap: findElement(overlay, "[data-console-heap]"),
-      uptime: findElement(overlay, "[data-console-uptime]"),
+      fps: requireElement(overlay, "[data-console-fps]"),
+      heap: requireElement(overlay, "[data-console-heap]"),
+      uptime: requireElement(overlay, "[data-console-uptime]"),
     },
     scope,
   );
@@ -59,7 +59,7 @@ export function mountConsoleOverlay(overlay: HTMLElement): CleanupFunction {
   };
 
   const setStatus = (text: string): void => {
-    if (lastCommand) lastCommand.textContent = text;
+    lastCommand.textContent = text;
   };
 
   /** The banner a real shell prints when it starts, using real numbers. */

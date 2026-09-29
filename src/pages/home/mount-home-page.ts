@@ -86,7 +86,7 @@ export function mountHomePage(main: HTMLElement): void {
 
   const stage = document.createElement("div");
   stage.className = "home-terminal-transcript home-terminal-transcript-stage";
-  requireElement(panel, ".home-terminal-body").appendChild(stage);
+  requireElement(panel, "[data-home-terminal-body]").appendChild(stage);
 
   void playHomeIntroSequence(stage, scope).then((menu) => {
     activateHomeNavigationMenu(menu, scope);
