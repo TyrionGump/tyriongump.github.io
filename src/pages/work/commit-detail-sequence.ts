@@ -39,6 +39,13 @@ function countUpMetrics(row: HTMLElement, scope: CleanupScope): void {
   }
 }
 
+/** Puts the code and its output in their final, shown state at once. */
+export function showCommitDetail(row: HTMLElement): void {
+  for (const line of findAllElements(row, "[data-source-line], [data-commit-console-line]")) {
+    line.classList.add("is-revealed");
+  }
+}
+
 export function playCommitDetailSequence(options: CommitDetailOptions): void {
   const { row, scope, onContentGrew } = options;
 
@@ -53,6 +60,7 @@ export function playCommitDetailSequence(options: CommitDetailOptions): void {
   const consoleLines = findAllElements(consoleBlock, "[data-commit-console-line]");
 
   if (prefersReducedMotion()) {
+    showCommitDetail(row);
     return;
   }
 

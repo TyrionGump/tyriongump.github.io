@@ -100,6 +100,11 @@ function consoleLineModifier(line: string): string {
   return "commit-console-line-body";
 }
 
+// Code lines keep whitespace, so nothing but the code may sit inside the element.
+function renderCodeLine(code: HtmlFragment): HtmlFragment {
+  return html`<div class="source-viewer-line" data-source-line>${code}</div>`;
+}
+
 function renderSourceViewer(project: Project): HtmlFragment {
   const codeLines = project.sourceCode.split("\n");
   const stats = buildStatBars(project.commit.linesAdded, project.commit.linesRemoved);
@@ -146,12 +151,7 @@ function renderSourceViewer(project: Project): HtmlFragment {
               aria-hidden="true"
             ></div>
             <div class="source-viewer-code" data-source-code>
-              ${codeLines.map(
-                (line) =>
-                  html`<div class="source-viewer-line" data-source-line>
-                    ${highlightTypeScriptLine(line)}
-                  </div>`,
-              )}
+              ${codeLines.map((line) => renderCodeLine(highlightTypeScriptLine(line)))}
             </div>
           </div>
         </div>
