@@ -70,8 +70,8 @@ export function renderPageHead(pageId: string): HtmlFragment {
     <script>
       document.documentElement.classList.add("js-enabled");
     </script>
-    <!-- crossorigin is required: fonts always load in CORS mode, and a mismatched preload is fetched twice. -->
     <link rel="stylesheet" href="/src/styles/index.css" />
+    <!-- crossorigin is required: fonts always load in CORS mode, and a mismatched preload is fetched twice. -->
     <link
       rel="preload"
       as="font"

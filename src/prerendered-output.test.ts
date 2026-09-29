@@ -47,6 +47,16 @@ describe("Work", () => {
     expect(lineCount).toBe(26);
   });
 
+  // Code lines keep whitespace, and a line of code never holds a line break. So a
+  // line break inside one is template formatting that would show on screen.
+  it("puts nothing but the code inside each code line", () => {
+    const lines = [...work.matchAll(/data-source-line>([\s\S]*?)<\/div>/g)].map(
+      (match) => match[1],
+    );
+    expect(lines.length).toBeGreaterThan(0);
+    for (const line of lines) expect(line).not.toContain("\n");
+  });
+
   it("shows only the two most recent commits in the graph", () => {
     expect(work).toContain('data-commit="ledger"');
     expect(work).toContain('data-commit="harbor"');

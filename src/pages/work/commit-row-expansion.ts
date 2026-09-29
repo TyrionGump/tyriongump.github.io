@@ -3,7 +3,7 @@ import { holdElementInPlace, type ScrollAnchor } from "../../lib/motion/hold-ele
 import type { ProjectId } from "../../content/projects";
 import { findAllElements, findElement, requireElement } from "../../lib/dom-queries";
 import { forceStyleReflow } from "../../lib/dom-rendering";
-import { playCommitDetailSequence } from "./commit-detail-sequence";
+import { playCommitDetailSequence, showCommitDetail } from "./commit-detail-sequence";
 import type { GraphDrawController } from "./graph-draw-sequence";
 
 /** Slack so a late reflow cannot clip the content. */
@@ -94,7 +94,10 @@ export function mountCommitExpansion(
       // anchor starts. The reveal comes from the inner content rising, not the height.
       fitBody(body);
       requestAnimationFrame(() => fitBody(body));
-      if (!animate) continue;
+      if (!animate) {
+        showCommitDetail(row);
+        continue;
+      }
 
       const inner = findElement(body, "[data-commit-body-inner]");
       if (inner) {

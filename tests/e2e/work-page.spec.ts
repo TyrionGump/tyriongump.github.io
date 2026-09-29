@@ -44,6 +44,38 @@ test("an open commit stays open after a visit to another page", async ({ page })
   await expect(page.getByText("Two banks, one transfer")).toBeVisible();
 });
 
+const firstCodeLine = (page: Page, projectId: string) =>
+  page.locator(`[data-commit="${projectId}"] [data-source-line]`).first();
+const firstConsoleLine = (page: Page, projectId: string) =>
+  page.locator(`[data-commit="${projectId}"] [data-commit-console-line]`).first();
+
+test("with reduced motion, an opened commit shows its code and output at once", async ({
+  page,
+}) => {
+  await goToWork(page);
+  await commitToggle(page, "ledger").click();
+
+  await expect(firstCodeLine(page, "ledger")).toHaveCSS("opacity", "1");
+  await expect(firstConsoleLine(page, "ledger")).toHaveCSS("opacity", "1");
+});
+
+test("a commit that is still open on a return visit shows its code", async ({ page }) => {
+  await goToWork(page);
+  await commitToggle(page, "ledger").click();
+  await page.getByRole("link", { name: "Personal →" }).click();
+  await page.getByRole("link", { name: "Work →" }).click();
+
+  await expect(commitToggle(page, "ledger")).toHaveAttribute("aria-expanded", "true");
+  await expect(firstCodeLine(page, "ledger")).toHaveCSS("opacity", "1");
+});
+
+test("each line of code is one row tall", async ({ page }) => {
+  await goToWork(page);
+  await commitToggle(page, "ledger").click();
+
+  await expect(firstCodeLine(page, "ledger")).toHaveCSS("height", "21px");
+});
+
 test.describe("with motion", () => {
   test.use({ reducedMotion: "no-preference" });
 
