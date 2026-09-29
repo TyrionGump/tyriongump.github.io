@@ -15,15 +15,15 @@
 
 import "./styles/index.css";
 
-import { mountConsoleOverlay } from "./components/console-overlay/mount-console-overlay";
-import { mountHomeTerminalPanel } from "./components/home-terminal-panel/mount-home-terminal-panel";
-import { mountScrollProgressRing } from "./components/scroll-progress-ring/mount-scroll-progress-ring";
-import { mountSiteNavigation } from "./components/site-navigation/mount-site-navigation";
-import { mountWorkGitGraph } from "./components/work-git-graph/mount-work-git-graph";
+import { mountConsoleOverlay } from "./chrome/console/mount-console-overlay";
+import { mountHomePage } from "./pages/home/mount-home-page";
+import { mountScrollProgressRing } from "./chrome/scroll-ring/mount-scroll-progress-ring";
+import { mountSiteNavigation } from "./chrome/navigation/mount-site-navigation";
+import { mountWorkPage } from "./pages/work/mount-work-page";
 import { startHashRouter } from "./routing/hash-router";
 import type { PageMounter } from "./routing/page-lifecycle";
 import type { RouteName } from "./routing/route-names";
-import { findAllElements, findElement, requireElement } from "./shared/dom-queries";
+import { findAllElements, findElement, requireElement } from "./lib/dom-queries";
 
 /**
  * How each route wakes up. A route with no entry here is static markup that
@@ -32,9 +32,9 @@ import { findAllElements, findElement, requireElement } from "./shared/dom-queri
  */
 const pageMounters: Partial<Record<RouteName, PageMounter>> = {
   home: (page) => ({
-    dispose: mountHomeTerminalPanel(requireElement(page, "[data-home-terminal-panel]")),
+    dispose: mountHomePage(requireElement(page, "[data-home-terminal-panel]")),
   }),
-  work: (page) => mountWorkGitGraph(page),
+  work: (page) => mountWorkPage(page),
 };
 
 /**

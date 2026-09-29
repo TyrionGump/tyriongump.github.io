@@ -7,8 +7,8 @@
  * intercepting clicks would not.
  */
 
-import type { CleanupFunction } from "../animation/cleanup-scope";
-import { CleanupScope } from "../animation/cleanup-scope";
+import type { CleanupFunction } from "../lib/cleanup-scope";
+import { CleanupScope } from "../lib/cleanup-scope";
 import { readRouteNameFromHash, type RouteName } from "./route-names";
 
 export interface HashRouterOptions {

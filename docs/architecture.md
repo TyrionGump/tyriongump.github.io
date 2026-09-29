@@ -56,7 +56,7 @@ its header which side it runs on.
 ### 2. `mount-*` returns a cleanup function
 
 Everything a component creates — timers, intervals, listeners, observers — is
-owned by a [`CleanupScope`](../src/animation/cleanup-scope.ts). Disposing it
+owned by a [`CleanupScope`](../src/lib/cleanup-scope.ts). Disposing it
 releases all of them _and_ swallows callbacks that fire afterwards, which stops a
 half-finished typing sequence writing into DOM that has been replaced.
 
@@ -99,41 +99,27 @@ Bone pins its status colour to green; the others let it follow the accent.
 ```
 build/          the prerender Vite plugin. Node-only tooling; never ships.
 src/
-  content/      page prose and data. Structural labels — section headings,
-                inline link text — stay in the render-* that lays them out
-  styles/       tokens, themes, reset, keyframes + the cascade manifest
+  lib/          html templating, DOM helpers, CleanupScope, and motion/.
+                Knows nothing about this site; imports nothing outside itself
   routing/      hash router, route names, page lifecycle
-  animation/    DOM motion, plus the cleanup and timing helpers it needs.
-                No site knowledge; imports nothing outside itself
-  shared/       html templating, DOM helpers
-  components/   one directory per component
+  content/      page prose and data
+  chrome/       what every page shares: navigation, footer, console, scroll ring
+  pages/        one directory per route: home/, work/, personal/
+  styles/       tokens, themes, reset, keyframes + the cascade manifest
   main.ts       the only place things are wired together
 ```
 
-**Imports run one way:** `shared` → `animation` → `routing` → `content` →
-`components` → `main.ts`, and nothing imports `main.ts`. This is enforced.
-`.oxlintrc.json` carries one `no-restricted-imports` override per layer, so
-reaching sideways or upward fails `pnpm lint` with a message naming the rule.
+**Imports run one way:** `lib` → `routing` → `content` → `chrome` → `pages` →
+`main.ts`. `.oxlintrc.json` enforces it with one `no-restricted-imports`
+override per directory. A page may not import another page, and only `main.ts`
+imports `mount-*` modules. `import/no-cycle` rejects anything that imports
+`main.ts`.
 
-`main.ts` needs no rule of its own: it imports the whole tree, so anything
-importing it forms a cycle, and `import/no-cycle` — configured with
-`ignoreTypes: false`, so type-only edges count — rejects it. That rule also stops
-a cycle forming inside a single layer, which the direction rules cannot see.
+**The build reaches into `src/` in two places.** `build/prerender-content-plugin.ts`
+imports only `lib/html-template`, the one Node-safe module in `lib/`.
+`vite.config.ts` imports the `render-*` entry points named in the slot map.
 
-**The tooling layer reaches into `src/` in exactly two places, and they are
-different files.** `build/prerender-content-plugin.ts` imports
-`shared/html-template` and nothing else; `vite.config.ts` imports the six
-`render-*` entry points named in the slot map. Nothing else, ever — the rest of
-`shared/` needs a DOM at call time, and only `html-template.ts` is Node-safe.
-`.oxlintrc.json` enforces the `build/` half.
-
-**`animation/` earns its place by being skippable, not by being reused.** Four of
-its seven modules have exactly one caller, and that is fine. `cleanup-scope.ts` is
-not an animation at all — it is what shuts one down; it lives there because
-everything in the directory needs it and it needs nothing itself. The router
-imports it too.
-
-**`styles/index.css` `@import`s upward into `components/*.css`.** That is the one
+**`styles/index.css` `@import`s upward into `chrome/*/*.css` and `pages/*/*.css`.** That is the one
 upward arrow in the repo, it is CSS rather than TypeScript, and it is deliberate:
 exactly one file may own an order. A stylesheet missing from it ships silently
 unstyled, so `prerendered-output.test.ts` checks both directions.
@@ -179,7 +165,7 @@ body instantly — the scroll anchor would otherwise chase a target moving a
 thousand pixels. Closing shrinks it over time instead, because folding that much
 height in one pass makes the browser snap the scroll position back, and once it
 does the old position cannot be recovered. See
-[`commit-row-expansion.ts`](../src/components/work-git-graph/commit-row-expansion.ts).
+[`commit-row-expansion.ts`](../src/pages/work/commit-row-expansion.ts).
 
 **Home replays on every visit; Work and Personal do not.** Arriving at Home
 should feel like arriving. Watching the graph redraw every time you come back
