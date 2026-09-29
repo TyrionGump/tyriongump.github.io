@@ -22,7 +22,7 @@ import { mountSiteNavigation } from "./chrome/navigation/mount-site-navigation";
 import { mountWorkPage } from "./pages/work/mount-work-page";
 import { startHashRouter } from "./routing/hash-router";
 import type { PageMounter } from "./routing/page-lifecycle";
-import type { RouteName } from "./routing/route-names";
+import type { RouteName } from "./site-pages";
 import { findAllElements, findElement, requireElement } from "./lib/dom-queries";
 
 /**

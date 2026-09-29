@@ -22,11 +22,16 @@ import {
   homeIntroCommand,
   homeIntroOutput,
   homeMenuCommand,
-  homeMenuItems,
+  homeMenuDescriptions,
   homeMenuPrompt,
   type TerminalOutputLine,
 } from "../../content/home-page-content";
 import { html, type HtmlFragment } from "../../lib/html-template";
+import { routeHref, routeNames } from "../../site-pages";
+
+type MenuRoute = keyof typeof homeMenuDescriptions;
+
+const menuRoutes = routeNames.filter((route): route is MenuRoute => route in homeMenuDescriptions);
 
 /** A prompt line with its command already typed out. */
 export function renderHomeCommandLine(
@@ -77,17 +82,17 @@ export function renderHomeNavigationMenu(): HtmlFragment {
         <span class="home-terminal-menu-hint">↑↓ · enter</span>
       </div>
       <ul class="home-terminal-menu-options">
-        ${homeMenuItems.map(
-          (item) => html`
+        ${menuRoutes.map(
+          (route) => html`
             <li>
               <a
                 class="home-terminal-menu-option"
-                href="#${item.route}"
-                data-home-menu-option="${item.route}"
+                href="${routeHref(route)}"
+                data-home-menu-option="${route}"
               >
                 <span class="home-terminal-menu-marker" aria-hidden="true"></span>
-                <span class="home-terminal-menu-label">${item.label}</span>
-                <span class="home-terminal-menu-description">${item.description}</span>
+                <span class="home-terminal-menu-label">${route}</span>
+                <span class="home-terminal-menu-description">${homeMenuDescriptions[route]}</span>
               </a>
             </li>
           `,

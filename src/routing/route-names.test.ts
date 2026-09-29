@@ -9,7 +9,8 @@
 
 import { describe, expect, it } from "vitest";
 
-import { defaultRouteName, isRouteName, readRouteNameFromHash, routeNames } from "./route-names";
+import { defaultRouteName, isRouteName, routeNames } from "../site-pages";
+import { readRouteNameFromHash } from "./route-names";
 
 describe("readRouteNameFromHash", () => {
   it("reads each real route", () => {

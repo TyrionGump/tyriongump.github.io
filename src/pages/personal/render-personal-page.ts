@@ -24,6 +24,7 @@ import {
 import { projectsNewestFirst } from "../../content/projects";
 import { siteIdentity } from "../../content/site-identity";
 import { html, type HtmlFragment } from "../../lib/html-template";
+import { routeHref } from "../../site-pages";
 import { renderSiteFooter } from "../../chrome/footer/render-site-footer";
 
 function renderProseSegment(segment: ProseSegment): HtmlFragment {
@@ -65,7 +66,7 @@ function renderProjectsBlock(): HtmlFragment {
         )}
       </ul>
       <p class="personal-projects-note">
-        the full log lives on <a class="personal-inline-link" href="#work">work</a>
+        the full log lives on <a class="personal-inline-link" href="${routeHref("work")}">work</a>
       </p>
     </div>
   `;

@@ -70,7 +70,7 @@ export function activateHomeNavigationMenu(menu: HTMLElement, scope: CleanupScop
       const selected = options[selectedIndex];
       if (!selected) return;
       event.preventDefault();
-      window.location.hash = selected.hash;
+      window.location.assign(selected.href);
     }
   });
 }

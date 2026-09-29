@@ -6,7 +6,7 @@
  * than a hunt through content.
  */
 
-import type { RouteName } from "../routing/route-names";
+import type { RouteName } from "../site-pages";
 import { siteIdentity } from "./site-identity";
 
 /** Which type role a terminal output line plays. Maps 1:1 to a CSS class. */
@@ -15,12 +15,6 @@ export type TerminalLineRole = "greeting" | "body" | "status";
 export type TerminalOutputLine =
   | { readonly kind: "blank-line" }
   | { readonly kind: "text"; readonly role: TerminalLineRole; readonly text: string };
-
-export interface HomeMenuItem {
-  readonly route: RouteName;
-  readonly label: string;
-  readonly description: string;
-}
 
 /** The command the visitor watches being typed first. */
 export const homeIntroCommand = "whoami";
@@ -52,7 +46,8 @@ export const homeMenuCommand = "open";
 
 export const homeMenuPrompt = "where to next";
 
-export const homeMenuItems: readonly HomeMenuItem[] = [
-  { route: "work", label: "work", description: "four systems, all still running" },
-  { route: "personal", label: "personal", description: "notes, experiments, a live shell" },
-];
+/** One line per page the menu offers. A page missing here is a type error. */
+export const homeMenuDescriptions: Readonly<Record<Exclude<RouteName, "home">, string>> = {
+  work: "four systems, all still running",
+  personal: "notes, experiments, a live shell",
+};

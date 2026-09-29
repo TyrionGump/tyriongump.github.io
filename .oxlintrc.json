@@ -25,7 +25,7 @@
           {
             "patterns": [
               {
-                "regex": "(\\.\\./)+(src/)?(routing|content|chrome|pages)/",
+                "regex": "(\\.\\./)+(src/)?(routing/|content/|chrome/|pages/|site-pages)",
                 "message": "lib/ is the floor: it knows nothing about this site."
               }
             ]

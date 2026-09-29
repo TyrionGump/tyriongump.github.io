@@ -7,19 +7,27 @@
 
 import { siteIdentity } from "../../content/site-identity";
 import { html, type HtmlFragment } from "../../lib/html-template";
+import { defaultRouteName, routeHref, sitePages } from "../../site-pages";
 
 export function renderSiteNavigation(): HtmlFragment {
   return html`
     <header class="site-navigation">
       <nav class="site-navigation-frame" aria-label="Primary">
-        <a class="site-navigation-logo" href="#home">
+        <a class="site-navigation-logo" href="${routeHref(defaultRouteName)}">
           <span class="site-navigation-status-dot" aria-hidden="true"></span>${siteIdentity.handle}
         </a>
         <div class="site-navigation-links">
-          <a class="site-navigation-link" href="#work" data-navigation-route="work">Work</a>
-          <a class="site-navigation-link" href="#personal" data-navigation-route="personal"
-            >Personal</a
-          >
+          ${sitePages
+            .filter((page) => page.route !== defaultRouteName)
+            .map(
+              (page) =>
+                html`<a
+                  class="site-navigation-link"
+                  href="${routeHref(page.route)}"
+                  data-navigation-route="${page.route}"
+                  >${page.label}</a
+                >`,
+            )}
           <a
             class="site-navigation-link site-navigation-link-mono"
             href="${siteIdentity.githubUrl}"
