@@ -106,16 +106,42 @@ for `/work/`, so real paths need no rewrite rules and no `404.html` trick.
 
 What the change cost:
 
-- Each page change is a full load. View transitions make it smooth where the
-  browser supports them. The dark background comes from the render-blocking
-  stylesheet, so there is no white flash.
+- Each page change became a full load, with the tab's loading spinner. swup now
+  changes pages in place. See the next entry.
 - Work and the console lost their in-memory state. `sessionStorage` now keeps the
   small part that matters. See [architecture.md](architecture.md).
 - Old `/#work` links needed a redirect. An inline script in Home's `<head>` does
   it.
 
-A client-side router on top of real pages is still possible later, as an extra
-layer. It is not needed now.
+---
+
+## swup changes pages in place
+
+A full load on each click showed the tab's loading spinner. swup fetches the next
+page and swaps its content, so there is no spinner. The real pages stay, so share
+previews, refreshes and visits without JavaScript do not change.
+
+**Why a package, not our own router.** The basic flow is small, but the edge
+cases are not: Cmd-click, `target="_blank"`, same-page anchors, a second click
+during a fetch, a failed fetch, scroll restoration, focus and screen-reader
+announcements. swup has fixed these over years. Custom code here is kept for what
+is unique: the typing, the graph and the scroll anchor.
+
+**Why swup.** It fits a site of real pages: it replaces only the containers you
+name, and the console overlay stays outside them. In September 2026 it had a
+release that month, 3 open issues, and about 40,000 weekly downloads. Turbo was
+the other candidate. It has company backing, but it replaces the whole `<body>`,
+shows cached pages by default, and had 353 open issues. Barba had no release
+since August 2024.
+
+**The risk.** Two volunteers do almost all of swup's work. If they stop, a pinned
+version keeps working, because it uses only stable browser APIs and no service.
+Only `mount-page-transitions.ts` imports swup, and the site works without it, so
+removal is one file and one import.
+
+**The cost.** It is the first dependency that ships to visitors: about 15 KB
+gzipped, with all four plugins. That took the site's JavaScript from about 11 KB
+to about 26 KB. Dependabot watches the swup packages for this reason.
 
 ---
 

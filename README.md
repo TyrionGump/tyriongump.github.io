@@ -5,7 +5,8 @@ session. Home is a shell window that types `whoami` and answers itself, Work is 
 `git log --graph` whose commits are the projects, and a console overlay takes
 real commands from anywhere.
 
-Vite + TypeScript 7, no UI framework. pnpm, oxlint, oxfmt, Vitest, Playwright.
+Vite + TypeScript 7, no UI framework, swup for page changes in place. pnpm, oxlint,
+oxfmt, Vitest, Playwright.
 
 ```bash
 pnpm install
