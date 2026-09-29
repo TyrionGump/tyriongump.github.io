@@ -48,6 +48,6 @@ export const homeMenuPrompt = "where to next";
 
 /** One line per page the menu offers. A page missing here is a type error. */
 export const homeMenuDescriptions: Readonly<Record<Exclude<RouteName, "home">, string>> = {
-  work: "four systems, all still running",
+  work: "two systems, both still running",
   personal: "notes, experiments, a live shell",
 };

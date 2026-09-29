@@ -17,7 +17,9 @@ import { renderPersonalPage } from "./pages/personal/render-personal-page";
 import { renderScrollProgressRing } from "./chrome/scroll-ring/render-scroll-progress-ring";
 import { renderSiteNavigation } from "./chrome/navigation/render-site-navigation";
 import { renderWorkPage } from "./pages/work/render-work-page";
+import { homeMenuDescriptions } from "./content/home-page-content";
 import { projects, workGraphProjectIds } from "./content/projects";
+import { workHeadlineLines } from "./content/work-page-content";
 import { notFoundPageId, renderPageHead } from "./render-page-document";
 import { sitePages, siteUrl } from "./site-pages";
 import { renderFragmentToMarkup } from "./lib/html-template";
@@ -67,6 +69,15 @@ describe("Work", () => {
     const controlled = [...work.matchAll(/aria-controls="([^"]+)"/g)].map((match) => match[1]);
     expect(controlled.length).toBe(workGraphProjectIds.length);
     for (const id of controlled) expect(work).toContain(`id="${id}"`);
+  });
+});
+
+describe("the copy", () => {
+  it("counts the systems that the Work graph actually shows", () => {
+    const words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+    const count = words[workGraphProjectIds.length];
+    expect(homeMenuDescriptions.work.toLowerCase()).toContain(`${count} systems`);
+    expect(workHeadlineLines.join(" ").toLowerCase()).toContain(`${count} systems`);
   });
 });
 
