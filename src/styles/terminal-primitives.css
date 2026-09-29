@@ -1,13 +1,3 @@
-/**
- * Pieces shared by every terminal surface on the site: the Home panel, the Work
- * command line, the Personal session, and the console overlay.
- *
- * These exist as one definition because the site's central idea is that all of
- * it is a single shell session seen from different angles — a caret that blinks
- * at a different rate in the console than on Home would break that.
- */
-
-/** The blinking block cursor. */
 .caret {
   display: inline-block;
   width: 7px;
@@ -18,19 +8,10 @@
   flex: none;
 }
 
-/**
- * The `❯` prompt glyph. One glyph, never a path — the page around it already
- * says where you are, and a path would just crowd the line that matters.
- */
 .terminal-prompt-glyph {
   color: var(--palette-status);
 }
 
-/**
- * The 74px prompt gutter: glyph in the fixed column, content in the rest. The
- * Work page's git graph draws its rails inside the same column, which is what
- * makes the graph and the session read as one surface.
- */
 .terminal-gutter-row {
   display: grid;
   grid-template-columns: var(--terminal-prompt-gutter) 1fr;

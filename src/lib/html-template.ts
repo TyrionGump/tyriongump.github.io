@@ -1,16 +1,4 @@
-/**
- * A tiny, escaping-by-default HTML template helper.
- *
- * `render-*` modules use this to produce markup as plain strings so they can run
- * both at build time (in Node, to bake content into `index.html`) and in the
- * browser. They must never touch the DOM.
- *
- * Interpolated values are HTML-escaped unless they are themselves `HtmlFragment`
- * values, which lets fragments nest without double-escaping:
- *
- *   const badge = html`<em>${userSuppliedText}</em>`   // escaped
- *   const row   = html`<li>${badge}</li>`              // inserted verbatim
- */
+// `html` escapes every interpolated value except an `HtmlFragment`, so fragments nest safely.
 
 const HTML_FRAGMENT_MARKER = Symbol("HtmlFragment");
 
@@ -36,11 +24,7 @@ function isHtmlFragment(value: unknown): value is HtmlFragment {
   return typeof value === "object" && value !== null && HTML_FRAGMENT_MARKER in value;
 }
 
-/**
- * Wraps markup that is already trusted (hand-authored constants, never user
- * input) so `html` will insert it verbatim. The name is deliberately alarming:
- * every call site should be obvious when reading a diff.
- */
+/** Inserted verbatim. Use only for hand-written constants, never for outside input. */
 export function unsafeTrustedHtml(markup: string): HtmlFragment {
   return createFragment(markup);
 }

@@ -1,18 +1,8 @@
-/**
- * Drives the scroll ring.
- *
- * The ring stays hidden unless the page has more than about half a screen to
- * travel, so short pages get no indicator at all — a progress ring that is
- * always full is just a button pretending to be information. In practice that
- * means Work shows one and Home does not.
- */
-
 import { CleanupScope, type CleanupFunction } from "../../lib/cleanup-scope";
 import { prefersReducedMotion } from "../../lib/motion/motion-preference";
 import { findElement } from "../../lib/dom-queries";
 import { scrollRingCircumference } from "./render-scroll-progress-ring";
 
-/** How much scrollable distance, as a fraction of the viewport, earns a ring. */
 const MINIMUM_TRAVEL_RATIO = 0.6;
 /** Ignore the first few pixels so the ring does not flicker at rest. */
 const MINIMUM_SCROLL_PX = 12;
@@ -52,9 +42,7 @@ export function mountScrollProgressRing(ring: HTMLElement): CleanupFunction {
   scope.addEventListener(window, "scroll", requestRepaint, { passive: true });
   scope.addEventListener(window, "resize", requestRepaint);
 
-  // The document also changes height without anyone scrolling — switching routes,
-  // opening a commit. Watching the body covers both without the router or the
-  // graph having to know this component exists.
+  // The page can change height without a scroll or resize event, so watch the body too.
   const resizeObserver = new ResizeObserver(requestRepaint);
   resizeObserver.observe(document.body);
   scope.onDispose(() => resizeObserver.disconnect());

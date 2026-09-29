@@ -7,7 +7,6 @@ import { mountHomePage } from "./pages/home/mount-home-page";
 import { mountWorkPage } from "./pages/work/mount-work-page";
 import { isRouteName, type RouteName } from "./site-pages";
 
-/** A page with no entry is static markup. */
 const pageMounters: Partial<Record<RouteName, (main: HTMLElement) => void>> = {
   home: mountHomePage,
   work: mountWorkPage,

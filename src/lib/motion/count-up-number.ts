@@ -1,10 +1,4 @@
-/**
- * Counts a number up to its final value on an ease-out curve.
- *
- * Used by the metrics band when a commit opens. Pair it with
- * `font-variant-numeric: tabular-nums` in CSS or the digits jitter as they
- * change width, which turns a count-up into a flicker.
- */
+// Pair with `font-variant-numeric: tabular-nums`, or the digits jitter as they change width.
 
 import type { CleanupScope } from "../cleanup-scope";
 import { prefersReducedMotion } from "./motion-preference";
@@ -17,7 +11,6 @@ export interface CountUpOptions {
   readonly scope: CleanupScope;
 }
 
-/** Fast at first, easing into the final value rather than stopping dead. */
 function easeOutCubic(progress: number): number {
   return 1 - Math.pow(1 - progress, 3);
 }

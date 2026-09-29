@@ -1,25 +1,11 @@
-/**
- * Number and stat formatting for the commit rows.
- *
- * Shared between the markup (which bakes the final values into the HTML) and
- * the count-up animation (which walks up to them). They have to use the same
- * function or the count-up would land on a subtly different string than the one
- * already on the page — a digit group separator appearing out of nowhere on the
- * last frame.
- *
- * Imported by `render-work-git-graph`, so this runs in Node at build time, and by
- * `commit-detail-sequence`, so it runs in the browser too. No DOM on either path.
- */
+// Used by the build-time markup and by the browser count-up, which must end on
+// the same string. No DOM.
 
 import type { ProjectMetric } from "../../content/projects";
 
-/**
- * Pinned rather than locale-derived: the markup is formatted in Node at build
- * time and the count-up formats in the browser, and those two must agree.
- */
+/** Pinned so Node (the markup) and the browser (the count-up) format alike. */
 const NUMBER_LOCALE = "en-US";
 
-/** Percentages keep two decimals; everything else is a whole number. */
 export function formatMetricValue(value: number, suffix: ProjectMetric["suffix"]): string {
   if (suffix === "%") return `${value.toFixed(2)}%`;
   const rounded = Math.round(value);
@@ -31,7 +17,6 @@ export function formatLineCount(value: number): string {
   return value.toLocaleString(NUMBER_LOCALE);
 }
 
-/** Total width of the added/removed bar, in block characters. */
 const STAT_BAR_WIDTH = 22;
 const STAT_BAR_CHARACTER = "▊";
 
@@ -40,11 +25,7 @@ export interface StatBars {
   readonly removed: string;
 }
 
-/**
- * `git --stat`'s proportional bar. At least one block is always added, so a
- * commit that only removed lines still shows the ratio rather than reading as
- * a pure deletion.
- */
+/** Always shows at least one added block, so a removal-only commit still reads as a ratio. */
 export function buildStatBars(linesAdded: number, linesRemoved: number): StatBars {
   const total = linesAdded + linesRemoved;
   const addedBlocks =

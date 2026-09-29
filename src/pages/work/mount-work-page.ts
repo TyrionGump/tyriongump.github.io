@@ -1,12 +1,3 @@
-/**
- * Brings the Work page to life: types the command, draws the graph, and turns
- * the commit rows into an accordion. The markup ships fully drawn and expanded,
- * which is what a reader without JavaScript gets.
- *
- * The graph draws once per session. A return visit shows it finished, with the
- * commit that was open still open.
- */
-
 import { projectIds, type ProjectId } from "../../content/projects";
 import { CleanupScope } from "../../lib/cleanup-scope";
 import { requireElement } from "../../lib/dom-queries";
@@ -19,7 +10,6 @@ import { workCommandText } from "./render-work-page";
 
 const COMMAND_TYPING_SPEED: TypingSpeed = { minimumDelayMs: 29, maximumDelayMs: 36 };
 const COMMAND_START_DELAY_MS = 200;
-/** The beat between the command finishing and the graph starting. */
 const DELAY_BEFORE_DRAW_MS = 200;
 
 const SESSION_KEY = "work-page";

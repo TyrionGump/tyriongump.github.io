@@ -1,14 +1,7 @@
-/**
- * The cascade, in order.
- *
- * Every stylesheet that ships is listed here, and the order they appear in is
- * the order they cascade. Nothing else imports CSS, so "what wins?" is answered
- * by reading down this list. Component stylesheets live beside their component;
- * `prerendered-output.test.ts` checks that this list and those files agree.
- */
+/* Import order is cascade order. Nothing else imports CSS.
+   prerendered-output.test.ts checks this list matches the stylesheets on disk. */
 
-/* Foundations — fonts first so the faces are declared before anything asks for
-   them, then tokens, since everything below reads from those. */
+/* Foundations. */
 @import "./fonts.css";
 @import "./design-tokens.css";
 @import "./reset.css";
@@ -27,10 +20,6 @@
 @import "../pages/personal/personal-page.css";
 @import "../pages/not-found/not-found-page.css";
 
-/* Overlays, last — a grouping, not a requirement. The console's two
-   `.is-console-open` trigger rules are the only place one component stylesheet
-   reaches into another, and neither depends on this position: naming two
-   classes already outranks the resting rules wherever it sits, and it sets the
-   exact values `:hover` sets, so their equal-weight tie has nothing to decide. */
+/* Overlays. */
 @import "../chrome/scroll-ring/scroll-progress-ring.css";
 @import "../chrome/console/console-overlay.css";

@@ -1,14 +1,3 @@
-/**
- * Guards the prerender pipeline end to end.
- *
- * These render functions run in Node at build time and their output is baked
- * into `index.html`. That is what makes the site readable without JavaScript and
- * what a crawler sees — so "the content is actually in the markup" is a property
- * worth asserting, not assuming. A component that quietly stopped emitting its
- * prose would still look fine in the browser, because script would animate the
- * empty shell perfectly well.
- */
-
 import { describe, expect, it } from "vitest";
 
 import { renderConsoleOverlay } from "./chrome/console/render-console-overlay";
@@ -114,7 +103,6 @@ describe("every prerendered fragment", () => {
   });
 
   it("gives the site-wide overlays the hooks their mount code requires", () => {
-    // `requireElement` throws on a miss, so a rename here is a blank page.
     const overlay = renderFragmentToMarkup(renderConsoleOverlay());
     for (const hook of [
       "data-console-overlay",
@@ -190,13 +178,8 @@ describe("the navigation", () => {
 });
 
 describe("the cascade manifest", () => {
-  /**
-   * `styles/index.css` is the only file that imports CSS, so a stylesheet
-   * missing from it ships silently unstyled with every gate green. The prerender
-   * plugin throws in both directions for slots; these are the same guard for
-   * stylesheets — and they cover `styles/` as well as `components/`, because
-   * either can be orphaned the same way.
-   */
+  // `styles/index.css` is the only file that imports CSS, so a stylesheet missing
+  // from it ships unstyled with every other check green.
   const manifest = "./styles/index.css";
   const stylesheetsOnDisk = [
     ...Object.keys(import.meta.glob("./styles/*.css")),
@@ -204,16 +187,13 @@ describe("the cascade manifest", () => {
     ...Object.keys(import.meta.glob("./pages/*/*.css")),
   ]
     .filter((path) => path !== manifest)
-    // Rewritten as `index.css` has to write them: its own siblings by name,
-    // component stylesheets one level up.
+    // As `index.css` writes them: siblings by name, the rest one level up.
     .map((path) =>
       path.startsWith("./styles/") ? path.replace("./styles/", "./") : path.replace("./", "../"),
     );
 
-  // Comments are stripped first: a commented-out `@import` is precisely the
-  // silent orphan this guards against, and raw text would still match it. Both
-  // `@import "x"` and the equivalent `@import url("x")` are accepted, and the
-  // quote style is the formatter's business, not this test's.
+  // Strip comments first: a commented-out `@import` is the orphan this test must catch.
+  // The regex accepts `url(...)` and either quote, since the formatter picks the style.
   const active = cascadeManifest.replace(/\/\*[\s\S]*?\*\//g, "");
   const listedPaths = [...active.matchAll(/@import\s+(?:url\(\s*)?["']([^"']+)["']/g)].map(
     (match) => match[1],

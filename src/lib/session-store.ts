@@ -1,9 +1,3 @@
-/**
- * Keeps small values for the rest of the browser tab's session, so state can
- * survive a page load. Storage can be full or blocked; then values are simply
- * not kept.
- */
-
 export function readSessionValue(key: string): unknown {
   try {
     const raw = sessionStorage.getItem(key);

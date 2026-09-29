@@ -1,11 +1,3 @@
-/**
- * The graph's whole character comes from one property: every stroke moves at the
- * same speed, so the drawing reads as a pen travelling rather than as segments
- * springing into place. That property lives in `strokeDurationMs`, and it is
- * invisible in a screenshot — a graph drawn at inconsistent speeds looks fine in
- * a still and wrong in motion. Worth a test.
- */
-
 import { describe, expect, it } from "vitest";
 
 import {
@@ -18,7 +10,6 @@ import {
 
 describe("strokeDurationMs", () => {
   it("is length divided by the pen speed", () => {
-    // The exact values observed in the running page.
     expect(strokeDurationMs(229)).toBe(498);
     expect(strokeDurationMs(42)).toBe(91);
     expect(strokeDurationMs(323)).toBe(702);
@@ -32,7 +23,6 @@ describe("strokeDurationMs", () => {
   });
 
   it("times the corner by its arc length, so the bend does not crawl", () => {
-    // A vertical of the same travel takes the same time as the curve.
     const curveMs = Math.round(graphGeometry.curvePathLength / graphGeometry.penSpeedPxPerMs);
     expect(strokeDurationMs(graphGeometry.curvePathLength)).toBe(curveMs);
   });
@@ -53,8 +43,6 @@ describe("path builders", () => {
   });
 
   it("leaves the trunk vertically before bending, so the branch grows out of it", () => {
-    // The first control point shares the start's x: that is what makes the
-    // departure tangential rather than a diagonal stuck onto the trunk.
     const path = buildBranchCurvePath();
     const startX = graphGeometry.trunkX + 1;
     const expectedPrefix = `M ${startX} ${branchCurveStartY} C ${startX} `;

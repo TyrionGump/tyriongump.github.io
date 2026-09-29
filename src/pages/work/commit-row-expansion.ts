@@ -1,25 +1,3 @@
-/**
- * Opening and closing commits.
- *
- * Only one is open at a time; opening one closes the other. Most of the code
- * here is not about the accordion — it is about the document not moving under
- * the reader while ~1000px of content appears and disappears. That behaviour is
- * subtle, easy to break, and worth preserving deliberately:
- *
- *  - **The clicked row is pinned.** Its distance from the top of the viewport is
- *    measured before the change and held afterwards, so opening never pulls the
- *    viewport around.
- *
- *  - **Switching collapses the outgoing body instantly**, because the anchor
- *    would otherwise be chasing a target that is itself moving a thousand pixels.
- *
- *  - **Closing shrinks it over time instead.** Folding removes that height in one
- *    pass; if that drops the maximum scroll below where the reader is, the
- *    browser clamps instantly and the viewport teleports. Shrinking gradually
- *    lets the clamp arrive gradually and the anchor ride it down. Clamping is
- *    lossy — once it happens the position cannot be recovered.
- */
-
 import { CleanupScope } from "../../lib/cleanup-scope";
 import { holdElementInPlace, type ScrollAnchor } from "../../lib/motion/hold-element-in-place";
 import type { ProjectId } from "../../content/projects";
@@ -28,17 +6,15 @@ import { forceStyleReflow } from "../../lib/dom-rendering";
 import { playCommitDetailSequence } from "./commit-detail-sequence";
 import type { GraphDrawController } from "./graph-draw-sequence";
 
-/** Slack above the measured content height, so a late reflow cannot clip it. */
+/** Slack so a late reflow cannot clip the content. */
 const BODY_HEIGHT_SLACK_PX = 48;
-/** How long to keep pinning after a click, covering late reflows. */
 const ANCHOR_DURATION_MS = 1500;
-/** Must outlast the collapse transition before the shrink rule is removed. */
+/** Must outlast the CSS collapse transition. */
 const COLLAPSE_TRANSITION_CLEANUP_MS = 500;
 
 const commitIdOf = (row: HTMLElement): ProjectId => row.dataset["commit"] as ProjectId;
 
 export interface CommitExpansionOptions {
-  /** Opened at once, with no animation, as if it had never closed. */
   readonly initialOpenCommitId: ProjectId | null;
   readonly onOpenCommitChange: (id: ProjectId | null) => void;
 }
@@ -52,21 +28,18 @@ export function mountCommitExpansion(
   const rows = findAllElements(graphRoot, "[data-commit]");
   let openCommitId: ProjectId | null = null;
   let scrollAnchor: ScrollAnchor | null = null;
-  /** Owns the running detail sequence, so opening again cancels the last one. */
   let detailScope: CleanupScope | null = null;
   scope.onDispose(() => detailScope?.dispose());
 
   /**
-   * Sizes an open body to its content. Returns false when it cannot be measured
-   * safely — a body that is not laid out reports zero, and writing that height
-   * would collapse an open commit to nothing.
+   * Returns false when the body cannot be measured. A body that is not laid out
+   * reports 0, and writing that would collapse an open commit.
    */
   const fitBody = (body: HTMLElement): boolean => {
     if (!body.offsetParent) return false;
 
-    // A closed row's detail cascade can still be running; without this it would
-    // re-inflate a body that has already been collapsed, leaving a tall
-    // invisible gap in the middle of the log.
+    // A closed row's detail sequence may still call this. Refitting it would
+    // re-inflate a collapsed body and leave a tall empty gap.
     const owner = body.closest<HTMLElement>("[data-commit]");
     if (!owner || commitIdOf(owner) !== openCommitId) return false;
 
@@ -104,22 +77,21 @@ export function mountCommitExpansion(
       const toggle = requireElement<HTMLButtonElement>(row, "[data-commit-toggle]");
 
       row.classList.toggle("is-open", isOpen);
-      // Everything that is not the open commit steps back rather than competing.
       row.classList.toggle("is-dimmed", nextId !== null && !isOpen);
       toggle.setAttribute("aria-expanded", String(isOpen));
       toggle.textContent = isOpen ? "close file" : "open file";
 
       if (!isOpen) {
+        // A full close shrinks over time: dropping the height at once can clamp
+        // the scroll position instantly, and that jump cannot be undone.
         collapseBody(body, isFullClose && id === previousId);
         continue;
       }
 
       detailScope = new CleanupScope();
 
-      // Claim the full height in ONE frame: the document's height changes once,
-      // in the same frame the anchor starts, so the scrollbar thumb travels
-      // steadily in one direction instead of stuttering. The reveal is carried
-      // by the inner content rising, not by the height growing.
+      // Claim the full height in one frame, so the page height changes once as the
+      // anchor starts. The reveal comes from the inner content rising, not the height.
       fitBody(body);
       requestAnimationFrame(() => fitBody(body));
       if (!animate) continue;
@@ -145,8 +117,7 @@ export function mountCommitExpansion(
 
     scope.addEventListener(head, "click", () => {
       scrollAnchor?.abort();
-      // Clicking during the draw finishes it immediately rather than queueing
-      // behind it — the row has to be at its real height before it is measured.
+      // Finish the draw first: the row must be at its real height before it is measured.
       drawController.snapToFinalState();
 
       const previousId = openCommitId;
@@ -157,9 +128,8 @@ export function mountCommitExpansion(
       options.onOpenCommitChange(nextId);
 
       if (previousId !== null && previousId !== id) {
-        // Switching: the outgoing body collapsed in the same layout pass and
-        // displaced this row. Correct for it before the anchor takes over, so
-        // the anchor has a still target rather than a moving one.
+        // Switching: the old body collapsed at once and moved this row. Correct for
+        // it now, so the anchor starts from a still target.
         const maximumScrollY = Math.max(
           0,
           document.documentElement.scrollHeight - window.innerHeight,
@@ -172,13 +142,11 @@ export function mountCommitExpansion(
     });
   }
 
-  // Any deliberate scroll hands control straight back to the reader.
+  // Any scroll input from the reader stops the anchor.
   for (const eventName of ["wheel", "touchstart", "keydown"]) {
     scope.addEventListener(window, eventName, () => scrollAnchor?.abort(), { passive: true });
   }
 
-  // A row that grows has to have its trunk dash re-cut: the trunk is a fixed
-  // length dash, not a scaled box, so it does not follow its row on its own.
   const resizeObserver = new ResizeObserver((entries) => {
     for (const entry of entries) drawController.syncRowTrunk(entry.target as HTMLElement);
   });
@@ -194,7 +162,6 @@ export function mountCommitExpansion(
 
   scope.addEventListener(window, "resize", refitOpenCommit);
 
-  // Script owns the collapsed state from here: the markup ships expanded so it
-  // reads without JavaScript, and this is the moment it becomes an accordion.
+  // The markup ships expanded so it reads without JavaScript. Collapse it now.
   setOpen(options.initialOpenCommitId, false);
 }

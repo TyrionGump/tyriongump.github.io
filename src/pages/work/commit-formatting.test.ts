@@ -1,10 +1,3 @@
-/**
- * These functions are shared between the markup (which bakes final values into
- * the HTML at build time) and the count-up animation (which walks up to them).
- * If they ever disagree, the last frame of every count-up visibly snaps to a
- * different string — so the contract is worth pinning down.
- */
-
 import { describe, expect, it } from "vitest";
 
 import { buildStatBars, formatLineCount, formatMetricValue } from "./commit-formatting";
@@ -33,7 +26,6 @@ describe("formatMetricValue", () => {
   });
 
   it("agrees at the target value regardless of how it was reached", () => {
-    // What the markup bakes, and what the last animation frame produces.
     expect(formatMetricValue(4000, "")).toBe(formatMetricValue(4000 * 1, ""));
   });
 });

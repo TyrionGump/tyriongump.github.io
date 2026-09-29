@@ -1,24 +1,12 @@
-/**
- * Runs a callback the first time an element scrolls into view.
- *
- * Nothing on this site should play out of sight — a sequence that finished
- * before the reader arrived is a sequence they never saw. Session segments and
- * the source viewer both hang off this.
- *
- * The observer disconnects after firing, so the callback runs exactly once.
- */
-
 import type { CleanupScope } from "../cleanup-scope";
 
 export interface RunWhenVisibleOptions {
   readonly threshold: number;
   /**
-   * Runs the callback anyway after this long if the element is already close to
-   * the viewport. Covers the case where the element is on screen at mount but
-   * the observer's first callback is missed because the page was hidden.
+   * Runs the callback after this long if the element is near the viewport.
+   * The observer can miss its first callback while the page is hidden.
    */
   readonly fallbackAfterMs?: number;
-  /** How near the viewport counts as "close enough" for the fallback. */
   readonly fallbackViewportMultiple?: number;
 }
 

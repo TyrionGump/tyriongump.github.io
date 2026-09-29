@@ -1,17 +1,11 @@
 name: Build and deploy
 
-# This repository is a GitHub *user* site (tyriongump.github.io), so the built
-# output is served from the domain root — which is why `base` is '/' in
-# vite.config.ts. Nothing here works until Pages is pointed at Actions:
-# Settings → Pages → Build and deployment → Source: "GitHub Actions".
-#
-# Pull requests run every check; only main publishes.
+# Nothing deploys until Settings → Pages → Build and deployment → Source is "GitHub Actions".
 
 on:
   push:
     branches: [main]
   pull_request:
-  # Lets you redeploy the current main without pushing an empty commit.
   workflow_dispatch:
 
 permissions:
@@ -25,20 +19,17 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # Reads the version from the `packageManager` field in package.json, so CI
-      # and local development can never drift.
+      # Reads the pnpm version from `packageManager` in package.json.
       - uses: pnpm/action-setup@v6
 
       - uses: actions/setup-node@v7
         with:
-          # Single source of truth with local development.
           node-version-file: .nvmrc
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
 
-      # Kept as separate steps rather than one `pnpm check`, so a red build
-      # names what broke without anyone opening the log.
+      # Separate steps, not one `pnpm check`, so a red build names what broke.
       - name: Type-check
         run: pnpm run typecheck
 
@@ -72,8 +63,7 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    # Never let two deploys race. Queue rather than cancel: a cancelled deploy can
-    # leave the live site mid-swap.
+    # Queue rather than cancel: a cancelled deploy can leave the live site mid-swap.
     concurrency:
       group: github-pages
       cancel-in-progress: false

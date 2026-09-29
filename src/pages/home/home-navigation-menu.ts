@@ -1,11 +1,3 @@
-/**
- * Selection behaviour for the Home menu.
- *
- * The options are real anchors, so clicking, middle-clicking and tabbing all
- * work without any of this. What this adds is the shell behaviour on top:
- * ↑/↓ move the highlight and Enter follows it, the way a real picker behaves.
- */
-
 import type { CleanupScope } from "../../lib/cleanup-scope";
 import { findAllElements } from "../../lib/dom-queries";
 
@@ -29,8 +21,7 @@ export function activateHomeNavigationMenu(menu: HTMLElement, scope: CleanupScop
       selectedIndex = index;
       paintSelection();
     });
-    // Keeps the highlight and the browser's own focus ring in agreement when
-    // someone tabs through instead of using the arrow keys.
+    // Keep the highlight on the focused option when someone tabs through.
     scope.addEventListener(option, "focus", () => {
       selectedIndex = index;
       paintSelection();

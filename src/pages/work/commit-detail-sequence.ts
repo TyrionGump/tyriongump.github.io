@@ -1,15 +1,5 @@
-/**
- * What plays inside a commit once it opens: the metrics count up, the source
- * file types itself out line by line, and its console output answers.
- *
- * Gated on visibility — the source viewer sits well below the fold on an open
- * commit, and a file that finished writing itself before the reader scrolled to
- * it is a file they never saw it write.
- *
- * Each run takes a token. A second run (opening the same commit again, or
- * switching to another) invalidates the first, so two staggered cascades cannot
- * interleave in the same element.
- */
+// The code cascade waits until the source viewer is visible: it sits below the
+// fold, and a cascade that ran off-screen would never be seen.
 
 import { CleanupScope } from "../../lib/cleanup-scope";
 import { countUpNumber } from "../../lib/motion/count-up-number";
@@ -19,24 +9,18 @@ import { findAllElements, findElement } from "../../lib/dom-queries";
 import { formatMetricValue } from "./commit-formatting";
 
 const COUNT_UP_DURATION_MS = 1100;
-/** Before the first code line appears. */
 const CODE_CASCADE_START_MS = 120;
-/** Between one code line and the next. */
 const CODE_CASCADE_STEP_MS = 40;
-/** After the last code line, before the console starts answering. */
 const CONSOLE_START_MS = 130;
 const CONSOLE_STEP_MS = 150;
 
-/** Fallback line height if the viewer has not been laid out yet. */
+/** Used while the viewer is not laid out and reports a height of 0. */
 const FALLBACK_LINE_HEIGHT_PX = 21;
 
 export interface CommitDetailOptions {
   readonly row: HTMLElement;
   readonly scope: CleanupScope;
-  /**
-   * Called when the sequence adds height the row's `max-height` does not yet
-   * account for, so the expansion controller can refit it.
-   */
+  /** Called when the sequence adds height the row's `max-height` does not cover yet. */
   readonly onContentGrew: () => void;
 }
 
@@ -69,12 +53,10 @@ export function playCommitDetailSequence(options: CommitDetailOptions): void {
   const consoleLines = findAllElements(consoleBlock, "[data-commit-console-line]");
 
   if (prefersReducedMotion()) {
-    // Everything is already in its final state in the markup; leave it there.
     return;
   }
 
-  // Reset to the pre-cascade state. Doing this here rather than in the markup
-  // means the baked HTML stays readable with scripting off.
+  // Reset here, not in the markup, so the baked HTML reads fine without JavaScript.
   for (const line of [...codeLines, ...consoleLines]) line.classList.remove("is-revealed");
   if (lineHighlight) lineHighlight.classList.remove("is-active");
 
@@ -86,7 +68,6 @@ export function playCommitDetailSequence(options: CommitDetailOptions): void {
         () => {
           line.classList.add("is-revealed");
 
-          // The highlight bar rides down the file the way a cursor would.
           if (lineHighlight) {
             lineHighlight.classList.add("is-active");
             lineHighlight.style.transform = `translateY(${index * lineHeightPx}px)`;
@@ -94,7 +75,6 @@ export function playCommitDetailSequence(options: CommitDetailOptions): void {
 
           if (index !== codeLines.length - 1) return;
 
-          // The file has finished; the console answers it.
           onContentGrew();
           consoleLines.forEach((consoleLine, consoleIndex) => {
             scope.setTimeout(

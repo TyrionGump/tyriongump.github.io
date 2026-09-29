@@ -1,5 +1,3 @@
-/** The shell every page sits inside. */
-
 .site-shell {
   min-height: 100vh;
   background: var(--palette-background);
@@ -16,11 +14,6 @@
   animation: rise-in 0.6s var(--easing-movement) both;
 }
 
-/**
- * The interior column: the frame every page and every footer hairline measures.
- * Home opts out via `.site-column-wide` because it is a centred hero rather than
- * a column, so it has no hairline to align to.
- */
 .site-column {
   max-width: var(--site-column-width);
   margin: 0 auto;
@@ -33,12 +26,10 @@
   padding-inline: var(--site-gutter-inline);
 }
 
-/** A full page height, less the sticky nav. */
 .site-viewport-fill {
   min-height: calc(100vh - var(--site-navigation-height));
 }
 
-/** Off-screen until focused, so a keyboard visitor can skip the nav on every page. */
 .skip-link {
   position: fixed;
   top: 0;
@@ -59,13 +50,11 @@
   outline-offset: -3px;
 }
 
-/* The skip target. It needs `tabindex="-1"` to accept focus, which would
-   otherwise draw a ring around the entire page. */
+/* The skip target needs `tabindex="-1"` to take focus. Without this, focus rings the whole page. */
 main:focus {
   outline: none;
 }
 
-/* Cross-fades between pages, where the browser supports it. */
 @view-transition {
   navigation: auto;
 }

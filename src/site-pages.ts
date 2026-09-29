@@ -1,8 +1,3 @@
-/**
- * The site's pages. The navigation, the footers, the Home menu, the console, the
- * HTML files and their `<head>` are all built from this list.
- */
-
 export const siteUrl = "https://tyriongump.github.io";
 
 export const sitePages = [

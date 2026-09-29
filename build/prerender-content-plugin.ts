@@ -1,10 +1,4 @@
-/**
- * Fills each HTML file's `<!--prerender:name-->` slots at build time and on every
- * dev-server request, so every page ships as real HTML.
- *
- * A file names its page with `<html data-page="…">`, and each renderer receives
- * that id. Renderers run here in Node, so they must not touch the DOM.
- */
+// Renderers run here in Node, at build time and per dev request, so they must not touch the DOM.
 
 import type { Plugin } from "vite";
 

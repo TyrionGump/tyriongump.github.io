@@ -1,18 +1,4 @@
-/**
- * Work: the project list, told as repository history.
- *
- * `main` is the trunk; every project is a branch still alive. As with Home, this
- * renders the **finished** state — the graph fully drawn, every commit expanded
- * — which is what ships in the HTML, what a crawler reads, and what someone
- * with JavaScript off sees. Script collapses the rows and animates the draw on
- * top of it.
- *
- * Positions here are computed from `graph-geometry.ts` rather than typed in, so
- * a rail and the node it must land on can never drift apart. They are the only
- * inline styles in the file; everything else is a class.
- *
- * Runs in Node at build time, so nothing here — or anything it imports — may touch the DOM.
- */
+// Runs in Node at build time, so nothing here or in its imports may touch the DOM.
 
 import { projects, workGraphProjectIds, type Project } from "../../content/projects";
 import { siteIdentity } from "../../content/site-identity";
@@ -25,7 +11,6 @@ import { highlightTypeScriptLine } from "./typescript-highlighter";
 
 export const workCommandText = `git log --graph --stat --author=${siteIdentity.handle}`;
 
-/** Top-left corner of a node whose centre should sit at (`centreX`, `centreY`). */
 function nodeOffsetStyle(centreX: number, centreY: number): string {
   const half = geometry.nodeSize / 2;
   return `left:${centreX - half}px; top:${centreY - half}px;`;
@@ -109,7 +94,6 @@ function renderMetricsBand(project: Project): HtmlFragment {
   `;
 }
 
-/** The console block colours its lines by what they are, the way a terminal does. */
 function consoleLineModifier(line: string): string {
   if (line.startsWith("›")) return "commit-console-line-command";
   if (line.includes("✓")) return "commit-console-line-success";

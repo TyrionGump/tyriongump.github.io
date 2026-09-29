@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-/**
- * Classes belong to CSS and `data-*` attributes belong to script, so a class can
- * be renamed for styling without breaking behaviour.
- */
+// Classes are for CSS and `data-*` is for script, so restyling cannot break behaviour.
 const sources = import.meta.glob(["./**/*.ts", "!./**/*.test.ts"], {
   query: "?raw",
   import: "default",

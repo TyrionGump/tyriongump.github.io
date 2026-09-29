@@ -1,16 +1,4 @@
-/**
- * A deliberately small TypeScript highlighter for the source viewer.
- *
- * It is not a parser and does not try to be: the only code it ever sees is the
- * handful of hand-written declarations in `src/content/projects.ts`. Pulling in
- * a real highlighter would add more bytes than the whole rest of the site for a
- * few dozen lines of display text.
- *
- * Token colours live in CSS (`.code-token-*`) rather than here, so the theme
- * owns them like everything else.
- *
- * Imported by `render-work-git-graph`, so this runs in Node at build time. No DOM.
- */
+// Not a parser: it only has to handle the snippets in `src/content/projects.ts`.
 
 import { escapeHtml, unsafeTrustedHtml, type HtmlFragment } from "../../lib/html-template";
 
@@ -27,14 +15,11 @@ type TokenClass =
 
 interface TokenRule {
   readonly pattern: RegExp;
-  /** `null` means "match it but leave it unstyled" — whitespace. */
+  /** `null` consumes the match but leaves it unstyled. */
   readonly tokenClass: TokenClass | null;
 }
 
-/**
- * Order matters: the first rule that matches at the cursor wins. Comments and
- * strings come first so a keyword inside either is not picked out.
- */
+/** First match wins. Comments and strings come first so keywords inside them stay plain. */
 const TOKEN_RULES: readonly TokenRule[] = [
   { pattern: /^\/\*[\s\S]*?\*\//, tokenClass: "comment" },
   { pattern: /^\/\/[^\n]*/, tokenClass: "comment" },
@@ -54,10 +39,7 @@ const TOKEN_RULES: readonly TokenRule[] = [
   { pattern: /^[^\s]/, tokenClass: "text" },
 ];
 
-/**
- * Highlights one line. Returns a non-breaking space for a blank line so the
- * line keeps its height in the viewer's fixed 21px grid.
- */
+/** A blank line returns `&nbsp;` so it keeps its row in the viewer's fixed line grid. */
 export function highlightTypeScriptLine(line: string): HtmlFragment {
   let markup = "";
   let remaining = line;
@@ -75,7 +57,7 @@ export function highlightTypeScriptLine(line: string): HtmlFragment {
       }
     }
 
-    // No rule matched: consume a single character so this can never loop.
+    // No rule matched: consume one character so the loop always ends.
     if (matchedText === null) {
       matchedText = remaining[0] as string;
       matchedClass = "text";

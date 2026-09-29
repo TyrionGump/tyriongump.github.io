@@ -1,12 +1,5 @@
-/**
- * The project records — one source for both the Work graph and the Personal
- * page, so the rich record and the commit line cannot drift apart.
- *
- * ⚠ PLACEHOLDER CONTENT. Every project below is invented, including the metrics
- * ("12,000 writes / second", "99.99% uptime, 2 years") and the commit hashes.
- * They exist to prove the layout. This is a portfolio with "open to work" on it
- * — replace them with real work before the site is published.
- */
+// ⚠ PLACEHOLDER CONTENT: every project, metric and commit hash below is invented.
+// Replace them with real work before the site is published.
 
 export const projectIds = ["ledger", "harbor", "prism", "sift"] as const;
 
@@ -14,7 +7,6 @@ export type ProjectId = (typeof projectIds)[number];
 
 export interface ProjectMetric {
   readonly value: number;
-  /** Rendered straight after the value: '%', 'ms', 'TB', or nothing. */
   readonly suffix: string;
   readonly label: string;
 }
@@ -24,13 +16,6 @@ export interface ProjectStorySection {
   readonly body: string;
 }
 
-/**
- * The parts of a project that exist because it is being told as a git commit.
- *
- * The collapsed head renders "hash · ref · year". The design also specifies a
- * subject and a relative date; both are omitted here rather than carried unused
- * — add them back alongside a renderer if you want them.
- */
 export interface ProjectCommit {
   readonly hash: string;
   readonly linesAdded: number;
@@ -43,11 +28,11 @@ export interface Project {
   readonly name: string;
   readonly year: string;
   readonly category: string;
-  /** One line, capped at 58ch on screen. */
+  /** Keep it to one line: the screen caps it at 58ch. */
   readonly oneLiner: string;
-  /** Short description used by the Personal page's project list. */
+  /** Shown in the Personal page's project list. */
   readonly shortDescription: string;
-  /** Longer answer given by the console's `open <project>` command. */
+  /** Printed by the console's `open <project>` command. */
   readonly shellDescription: string;
   readonly role: readonly string[];
   readonly stack: readonly string[];
@@ -270,12 +255,7 @@ function plan(q: Query): Scan {
   },
 };
 
-/**
- * The graph deliberately shows only the two most recent commits. The others are
- * real records that appear on the Personal page — a `git log` that scrolled
- * forever would bury the point.
- */
 export const workGraphProjectIds = ["ledger", "harbor"] as const satisfies readonly ProjectId[];
 
-/** Newest first, for the Personal page's index. */
+/** Newest first only because `projectIds` is listed newest first. */
 export const projectsNewestFirst: readonly Project[] = projectIds.map((id) => projects[id]);

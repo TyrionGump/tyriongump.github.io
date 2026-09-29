@@ -1,16 +1,4 @@
-/**
- * Personal — the human half, in prose.
- *
- * This page is entirely static: no typing, no drawing, nothing to mount. That
- * is deliberate rather than a shortcut. Work is the machine telling you about
- * the work; Personal is a person talking, and a page that performs would be
- * saying the opposite of what it says.
- *
- * The design also specifies a "session" mode replaying this content as a shell
- * transcript; prose is the one built.
- *
- * Runs in Node at build time, so nothing here — or anything it imports — may touch the DOM.
- */
+// Runs in Node at build time, so nothing here or in its imports may touch the DOM.
 
 import {
   contactStatement,
