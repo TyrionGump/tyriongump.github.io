@@ -37,7 +37,7 @@
   padding: 24px 28px 10px;
   cursor: text;
   /* A thinner bar than the page's: this is a panel, not the document. */
-  scrollbar-color: rgba(var(--palette-accent-rgb), 0.22) transparent;
+  scrollbar-color: color-mix(in srgb, var(--palette-accent) 22%, transparent) transparent;
 }
 
 .console-body::-webkit-scrollbar {

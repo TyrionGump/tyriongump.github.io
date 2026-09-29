@@ -18,7 +18,7 @@
   max-width: 600px;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid rgba(var(--palette-accent-rgb), 0.2);
+  border: 1px solid color-mix(in srgb, var(--palette-accent) 20%, transparent);
   background: var(--palette-panel);
   box-shadow: var(--shadow-panel);
   animation: rise-in 0.9s var(--easing-movement) 0.1s both;
@@ -28,7 +28,7 @@
 }
 
 .home-terminal-panel.is-window-unfocused {
-  border-color: rgba(var(--palette-accent-rgb), 0.08);
+  border-color: color-mix(in srgb, var(--palette-accent) 8%, transparent);
   box-shadow: var(--shadow-panel-unfocused);
 }
 
@@ -185,7 +185,7 @@
 }
 
 .home-terminal-menu-option.is-selected {
-  background: rgba(var(--palette-accent-rgb), 0.1);
+  background: color-mix(in srgb, var(--palette-accent) 10%, transparent);
 }
 
 .home-terminal-menu-marker {

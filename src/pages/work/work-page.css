@@ -65,6 +65,7 @@
   position: absolute;
   left: 0;
   top: 0;
+  width: var(--terminal-prompt-gutter);
 }
 
 /* One group at one opacity: where the branch meets the trunk, two strokes
@@ -298,7 +299,7 @@
    cursor — the entire head is the target. */
 .commit-row:not(.is-open) .commit-head:hover .commit-cue {
   color: var(--palette-accent);
-  border-color: rgba(var(--palette-accent-rgb), 0.35);
+  border-color: color-mix(in srgb, var(--palette-accent) 35%, transparent);
 }
 
 .commit-row:not(.is-open) .commit-head:hover .graph-node {
@@ -317,8 +318,8 @@
 
 .commit-row.is-open .commit-cue {
   color: var(--palette-accent);
-  border-color: rgba(var(--palette-accent-rgb), 0.4);
-  background: rgba(var(--palette-accent-rgb), 0.06);
+  border-color: color-mix(in srgb, var(--palette-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--palette-accent) 6%, transparent);
 }
 
 /* ---- Commit body ------------------------------------------------------- */
@@ -547,7 +548,7 @@
 }
 
 .source-viewer-line-highlight.is-active {
-  background: rgba(var(--palette-accent-rgb), 0.06);
+  background: color-mix(in srgb, var(--palette-accent) 6%, transparent);
 }
 
 .source-viewer-code {

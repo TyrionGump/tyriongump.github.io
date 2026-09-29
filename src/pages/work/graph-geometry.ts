@@ -6,18 +6,11 @@
  * drawing: changing one number without the others produces a rail that misses
  * its node by two pixels, which is the kind of bug you see but cannot name.
  *
- * Note `gutterWidth` is the same 74px prompt gutter the terminal lines use on
- * Work and Personal. The graph draws its rails inside it, which is what makes
- * the graph and the shell session read as one surface. Changing it means
- * changing it on both pages together.
- *
  * Imported by `render-work-git-graph`, so this runs in Node at build time, and by
  * `graph-draw-sequence`, so it runs in the browser too. No DOM on either path.
  */
 
 export const graphGeometry = {
-  /** The prompt gutter the whole graph is drawn inside. */
-  gutterWidth: 74,
   /** Horizontal position of the trunk (`main`). */
   trunkX: 12,
   /** Horizontal position of a branch once it has peeled away. */

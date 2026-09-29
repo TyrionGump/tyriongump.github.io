@@ -196,13 +196,7 @@ function renderCommitRow(project: Project): HtmlFragment {
   return html`
     <article class="graph-row commit-row" data-graph-row="commit" data-commit="${project.id}">
       <div class="graph-rail-column">
-        <svg
-          class="graph-branch"
-          width="${geometry.gutterWidth}"
-          height="100%"
-          aria-hidden="true"
-          focusable="false"
-        >
+        <svg class="graph-branch" height="100%" aria-hidden="true" focusable="false">
           <!-- One group at one opacity, so nothing brightens where the branch meets the trunk. -->
           <g
             class="graph-branch-strokes"

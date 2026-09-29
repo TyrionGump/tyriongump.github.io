@@ -32,8 +32,8 @@
 }
 
 .scroll-ring-track {
-  fill: rgba(var(--palette-background-rgb), 0.55);
-  stroke: rgba(var(--palette-accent-rgb), 0.14);
+  fill: color-mix(in srgb, var(--palette-background) 55%, transparent);
+  stroke: color-mix(in srgb, var(--palette-accent) 14%, transparent);
   stroke-width: 1.5;
 }
 
@@ -47,7 +47,7 @@
 }
 
 .scroll-ring-dot {
-  fill: rgba(var(--palette-accent-rgb), 0.5);
+  fill: color-mix(in srgb, var(--palette-accent) 50%, transparent);
   transition: fill 0.25s ease;
 }
 
