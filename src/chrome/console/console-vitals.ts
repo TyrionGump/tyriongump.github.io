@@ -31,9 +31,9 @@ function padTwo(value: number): string {
 }
 
 export interface ConsoleVitalsElements {
-  readonly fps: HTMLElement | null;
-  readonly heap: HTMLElement | null;
-  readonly uptime: HTMLElement | null;
+  readonly fps: HTMLElement;
+  readonly heap: HTMLElement;
+  readonly uptime: HTMLElement;
 }
 
 export interface ConsoleVitals {
@@ -59,8 +59,7 @@ export function createConsoleVitals(
     framesSinceMark += 1;
     const elapsed = now - markedAt;
     if (elapsed >= 1000) {
-      if (elements.fps)
-        elements.fps.textContent = String(Math.round((framesSinceMark * 1000) / elapsed));
+      elements.fps.textContent = String(Math.round((framesSinceMark * 1000) / elapsed));
       framesSinceMark = 0;
       markedAt = now;
     }
@@ -69,11 +68,9 @@ export function createConsoleVitals(
 
   const sampleSlowVitals = (): void => {
     if (!isRunning) return;
-    if (elements.heap) elements.heap.textContent = readHeapMegabytes();
-    if (elements.uptime) {
-      const seconds = Math.floor((performance.now() - pageOpenedAt) / 1000);
-      elements.uptime.textContent = `${padTwo(Math.floor(seconds / 60))}:${padTwo(seconds % 60)}`;
-    }
+    elements.heap.textContent = readHeapMegabytes();
+    const seconds = Math.floor((performance.now() - pageOpenedAt) / 1000);
+    elements.uptime.textContent = `${padTwo(Math.floor(seconds / 60))}:${padTwo(seconds % 60)}`;
   };
 
   scope.setInterval(sampleSlowVitals, SLOW_SAMPLE_INTERVAL_MS);

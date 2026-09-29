@@ -19,6 +19,8 @@ import { workCommandText } from "./render-work-page";
 
 const COMMAND_TYPING_SPEED: TypingSpeed = { minimumDelayMs: 29, maximumDelayMs: 36 };
 const COMMAND_START_DELAY_MS = 200;
+/** The beat between the command finishing and the graph starting. */
+const DELAY_BEFORE_DRAW_MS = 200;
 
 const SESSION_KEY = "work-page";
 
@@ -49,13 +51,14 @@ export function mountWorkPage(main: HTMLElement): void {
     command.textContent = workCommandText;
     drawController.snapToFinalState();
   } else {
+    saveState({ hasDrawn: true });
     void typeTextIntoElement(command, workCommandText, {
       scope,
       speed: COMMAND_TYPING_SPEED,
       startDelayMs: COMMAND_START_DELAY_MS,
-    });
-    drawController.play();
-    saveState({ hasDrawn: true });
+    })
+      .then(() => scope.delay(DELAY_BEFORE_DRAW_MS))
+      .then(() => drawController.play());
   }
 
   mountCommitExpansion(graphRoot, drawController, scope, {

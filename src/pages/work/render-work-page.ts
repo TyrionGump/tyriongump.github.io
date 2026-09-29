@@ -36,7 +36,7 @@ const NODE_CENTRE_X_BRANCH = geometry.branchX + 1;
 
 function renderHeadRow(): HtmlFragment {
   return html`
-    <div class="graph-row graph-row-head">
+    <div class="graph-row graph-row-head" data-graph-row="head">
       <div class="graph-rail-column">
         <div
           class="graph-trunk"
@@ -62,7 +62,7 @@ function renderHeadRow(): HtmlFragment {
 
 function renderRootRow(): HtmlFragment {
   return html`
-    <div class="graph-row graph-row-root">
+    <div class="graph-row graph-row-root" data-graph-row="root">
       <div class="graph-rail-column">
         <div
           class="graph-trunk"
@@ -94,7 +94,11 @@ function renderMetricsBand(project: Project): HtmlFragment {
       ${project.metrics.map(
         (metric) => html`
           <div class="commit-metric">
-            <div class="commit-metric-value" data-commit-metric-value>
+            <div
+              class="commit-metric-value"
+              data-commit-metric-value="${metric.value}"
+              data-commit-metric-suffix="${metric.suffix}"
+            >
               ${formatMetricValue(metric.value, metric.suffix)}
             </div>
             <div class="commit-metric-label">${metric.label}</div>
@@ -160,7 +164,9 @@ function renderSourceViewer(project: Project): HtmlFragment {
             <div class="source-viewer-code" data-source-code>
               ${codeLines.map(
                 (line) =>
-                  html`<div class="source-viewer-line">${highlightTypeScriptLine(line)}</div>`,
+                  html`<div class="source-viewer-line" data-source-line>
+                    ${highlightTypeScriptLine(line)}
+                  </div>`,
               )}
             </div>
           </div>
@@ -171,7 +177,12 @@ function renderSourceViewer(project: Project): HtmlFragment {
           <div class="commit-console" data-commit-console>
             ${project.consoleOutput.map(
               (line) =>
-                html`<div class="commit-console-line ${consoleLineModifier(line)}">${line}</div>`,
+                html`<div
+                  class="commit-console-line ${consoleLineModifier(line)}"
+                  data-commit-console-line
+                >
+                  ${line}
+                </div>`,
             )}
           </div>
         </div>
@@ -183,7 +194,7 @@ function renderSourceViewer(project: Project): HtmlFragment {
 function renderCommitRow(project: Project): HtmlFragment {
   const bodyId = `commit-body-${project.id}`;
   return html`
-    <article class="graph-row commit-row" data-commit="${project.id}">
+    <article class="graph-row commit-row" data-graph-row="commit" data-commit="${project.id}">
       <div class="graph-rail-column">
         <svg
           class="graph-branch"

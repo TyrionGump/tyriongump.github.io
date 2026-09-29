@@ -22,7 +22,7 @@
 
 import { CleanupScope } from "../../lib/cleanup-scope";
 import { holdElementInPlace, type ScrollAnchor } from "../../lib/motion/hold-element-in-place";
-import { projects, type ProjectId } from "../../content/projects";
+import type { ProjectId } from "../../content/projects";
 import { findAllElements, findElement, requireElement } from "../../lib/dom-queries";
 import { forceStyleReflow } from "../../lib/dom-rendering";
 import { playCommitDetailSequence } from "./commit-detail-sequence";
@@ -54,6 +54,7 @@ export function mountCommitExpansion(
   let scrollAnchor: ScrollAnchor | null = null;
   /** Owns the running detail sequence, so opening again cancels the last one. */
   let detailScope: CleanupScope | null = null;
+  scope.onDispose(() => detailScope?.dispose());
 
   /**
    * Sizes an open body to its content. Returns false when it cannot be measured
@@ -114,7 +115,6 @@ export function mountCommitExpansion(
       }
 
       detailScope = new CleanupScope();
-      scope.onDispose(() => detailScope?.dispose());
 
       // Claim the full height in ONE frame: the document's height changes once,
       // in the same frame the anchor starts, so the scrollbar thumb travels
@@ -133,7 +133,6 @@ export function mountCommitExpansion(
 
       playCommitDetailSequence({
         row,
-        project: projects[id],
         scope: detailScope,
         onContentGrew: () => fitBody(body),
       });

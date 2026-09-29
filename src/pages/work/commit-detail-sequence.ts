@@ -15,7 +15,6 @@ import { CleanupScope } from "../../lib/cleanup-scope";
 import { countUpNumber } from "../../lib/motion/count-up-number";
 import { prefersReducedMotion } from "../../lib/motion/motion-preference";
 import { runWhenVisible } from "../../lib/motion/run-when-visible";
-import type { Project } from "../../content/projects";
 import { findAllElements, findElement } from "../../lib/dom-queries";
 import { formatMetricValue } from "./commit-formatting";
 
@@ -33,7 +32,6 @@ const FALLBACK_LINE_HEIGHT_PX = 21;
 
 export interface CommitDetailOptions {
   readonly row: HTMLElement;
-  readonly project: Project;
   readonly scope: CleanupScope;
   /**
    * Called when the sequence adds height the row's `max-height` does not yet
@@ -42,33 +40,33 @@ export interface CommitDetailOptions {
   readonly onContentGrew: () => void;
 }
 
-function countUpMetrics(options: CommitDetailOptions): void {
-  const values = findAllElements(options.row, "[data-commit-metric-value]");
-  values.forEach((element, index) => {
-    const metric = options.project.metrics[index];
-    if (!metric) return;
+function countUpMetrics(row: HTMLElement, scope: CleanupScope): void {
+  for (const element of findAllElements(row, "[data-commit-metric-value]")) {
+    const targetValue = Number(element.dataset["commitMetricValue"]);
+    const suffix = element.dataset["commitMetricSuffix"] ?? "";
+    if (!Number.isFinite(targetValue)) continue;
     countUpNumber({
       element,
-      targetValue: metric.value,
+      targetValue,
       durationMs: COUNT_UP_DURATION_MS,
-      formatValue: (value) => formatMetricValue(value, metric.suffix),
-      scope: options.scope,
+      formatValue: (value) => formatMetricValue(value, suffix),
+      scope,
     });
-  });
+  }
 }
 
 export function playCommitDetailSequence(options: CommitDetailOptions): void {
   const { row, scope, onContentGrew } = options;
 
-  countUpMetrics(options);
+  countUpMetrics(row, scope);
 
   const codeBlock = findElement(row, "[data-source-code]");
   const consoleBlock = findElement(row, "[data-commit-console]");
   const lineHighlight = findElement(row, "[data-source-line-highlight]");
   if (!codeBlock || !consoleBlock) return;
 
-  const codeLines = findAllElements(codeBlock, ".source-viewer-line");
-  const consoleLines = findAllElements(consoleBlock, ".commit-console-line");
+  const codeLines = findAllElements(codeBlock, "[data-source-line]");
+  const consoleLines = findAllElements(consoleBlock, "[data-commit-console-line]");
 
   if (prefersReducedMotion()) {
     // Everything is already in its final state in the markup; leave it there.

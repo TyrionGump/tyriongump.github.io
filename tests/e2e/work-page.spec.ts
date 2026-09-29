@@ -58,6 +58,16 @@ test.describe("with motion", () => {
     );
   });
 
+  test("an opened commit counts its metrics up to their real values", async ({ page }) => {
+    await goToWork(page);
+    await commitToggle(page, "ledger").click();
+
+    const metrics = page.locator('[data-commit="ledger"] [data-commit-metric-value]');
+    // The built page already shows the final values, so first see the count start.
+    await expect(metrics.first()).not.toHaveText("12,000");
+    await expect(metrics).toHaveText(["12,000", "3", "99.99%"], { timeout: 5_000 });
+  });
+
   test("the Home intro finishes and the menu takes the keyboard", async ({ page }) => {
     await page.goto("/");
     // The animated copy is appended after the baked one, so it is the last menu.
