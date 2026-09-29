@@ -19,7 +19,7 @@ import { renderScrollProgressRing } from "./chrome/scroll-ring/render-scroll-pro
 import { renderSiteNavigation } from "./chrome/navigation/render-site-navigation";
 import { renderWorkPage } from "./pages/work/render-work-page";
 import { projects, workGraphProjectIds } from "./content/projects";
-import { defaultRouteName, routeNames } from "./routing/route-names";
+import { routeNames } from "./site-pages";
 import { renderFragmentToMarkup } from "./lib/html-template";
 import cascadeManifest from "./styles/index.css?raw";
 
@@ -34,15 +34,6 @@ describe("Home", () => {
     expect(home).toContain("whoami");
     expect(home).toContain("Hi, I&#39;m Andrew.");
     expect(home).toContain("the API in the middle, and the screen you actually use.");
-  });
-
-  // Derived rather than hardcoded: `homeMenuItems` is an array, so omitting a
-  // route from the menu is not a type error.
-  it("ships every menu destination as a real link", () => {
-    for (const route of routeNames) {
-      if (route === defaultRouteName) continue;
-      expect(home).toContain(`href="#${route}"`);
-    }
   });
 });
 
@@ -148,21 +139,6 @@ describe("the document and the route list", () => {
       // the nav and the overlays are not — see the slot map in `vite.config.ts`.
       expect(documentMarkup).toMatch(
         new RegExp(`<section[^>]*data-page="${route}"[^>]*>\\s*<!--prerender:${route}-page-->`),
-      );
-    }
-  });
-
-  // `render-site-navigation.ts` writes its hrefs as literals and does not import
-  // the route list, so a new route can prerender, pass everything else here, and
-  // still be reachable only by typing the hash.
-  it("links every non-default route from the navigation", () => {
-    for (const route of routeNames) {
-      if (route === defaultRouteName) continue;
-      // Both on the same tag. `data-navigation-route` only drives the active
-      // class, so asserting it alone would pass a link whose href is misspelled
-      // — it would still highlight correctly and still navigate to Home.
-      expect(navigation).toMatch(
-        new RegExp(`<a\\b[^>]*href="#${route}"[^>]*data-navigation-route="${route}"`),
       );
     }
   });

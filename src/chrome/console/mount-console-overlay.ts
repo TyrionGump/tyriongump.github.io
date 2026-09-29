@@ -10,7 +10,7 @@
  */
 
 import { CleanupScope, type CleanupFunction } from "../../lib/cleanup-scope";
-import type { RouteName } from "../../routing/route-names";
+import { routeHref, type RouteName } from "../../site-pages";
 import { findAllElements, findElement, requireElement } from "../../lib/dom-queries";
 import { appendFragment } from "../../lib/dom-rendering";
 import { html, type HtmlFragment } from "../../lib/html-template";
@@ -120,7 +120,7 @@ export function mountConsoleOverlay(overlay: HTMLElement): CleanupFunction {
     closeConsole: () => setOpen(false),
     navigateTo: (route: RouteName) => {
       setStatus(`route → ${route}`);
-      window.location.hash = `#${route}`;
+      window.location.assign(routeHref(route));
       setOpen(false);
     },
     openExternalUrl: (url) => {

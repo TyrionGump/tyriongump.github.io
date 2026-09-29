@@ -8,7 +8,7 @@
  */
 
 import { CleanupScope, type CleanupFunction } from "../../lib/cleanup-scope";
-import type { RouteName } from "../../routing/route-names";
+import type { RouteName } from "../../site-pages";
 import { findAllElements } from "../../lib/dom-queries";
 
 export interface SiteNavigationController {

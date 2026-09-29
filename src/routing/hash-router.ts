@@ -9,7 +9,8 @@
 
 import type { CleanupFunction } from "../lib/cleanup-scope";
 import { CleanupScope } from "../lib/cleanup-scope";
-import { readRouteNameFromHash, type RouteName } from "./route-names";
+import type { RouteName } from "../site-pages";
+import { readRouteNameFromHash } from "./route-names";
 
 export interface HashRouterOptions {
   /**
